@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agarbatti Business AI Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+:root{--bg:#0e1015;--panel:#171b23;--pink:#d51b78;--blue:#2d9cdb;--cyan:#55b7e8;--green:#35c98b;--red:#e45756;--text:#f5f7fa;--muted:#9da7b5}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}
+header{padding:18px 28px;border-bottom:1px solid #292e38;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#0e1015ee;backdrop-filter:blur(10px);z-index:5}
+h1{font-size:18px;margin:0}button{border:0;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer;color:#fff;background:var(--pink)}
+button.secondary{background:#29303a}.wrap{padding:22px;max-width:1500px;margin:auto}
+.tabs{display:flex;gap:8px;margin-bottom:18px}.tab{background:#1a1f27;color:#b9c2cf}.tab.active{background:var(--pink);color:white}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.card{background:var(--panel);border:1px solid #272d37;border-radius:10px;padding:16px}.label{font-size:12px;color:var(--muted);text-transform:uppercase}.value{font-size:25px;font-weight:800;margin-top:8px}
+.blue{color:var(--cyan)}.green{color:var(--green)}.pink{color:#ef4da1}.red{color:#ff716f}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.chartbox{height:330px;background:var(--panel);border:1px solid #272d37;border-radius:10px;padding:14px}
+.section{margin:18px 0 10px;font-weight:800}.tablebox{overflow:auto;background:var(--panel);border-radius:10px;border:1px solid #272d37}
+table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;border-bottom:1px solid #292f39;text-align:left;font-size:13px}th{color:var(--muted);position:sticky;top:0;background:#171b23}
+input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radius:7px;padding:9px;width:100%}
+.formgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}.actions{display:flex;gap:8px;margin-top:12px}
+.ai{background:linear-gradient(135deg,#191d27,#201527);border:1px solid #4a2340}.insight{padding:10px 0;border-bottom:1px solid #342936;color:#dce2ea}.insight:last-child{border:0}
+.hidden{display:none}.status{font-size:12px;color:var(--green)}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.formgrid{grid-template-columns:repeat(2,1fr)}header{padding:14px}.wrap{padding:14px}}
+@media(max-width:520px){.grid{grid-template-columns:1fr 1fr}.formgrid{grid-template-columns:1fr 1fr}.value{font-size:19px}}
+
+/* AI chat sidebar */
+.chat-toggle{position:fixed;right:18px;bottom:18px;z-index:20;border-radius:999px;padding:14px 18px;box-shadow:0 8px 30px #0008}
+.chat-panel{position:fixed;right:18px;bottom:78px;width:min(390px,calc(100vw - 36px));height:620px;max-height:75vh;background:#11151c;border:1px solid #343b46;border-radius:16px;z-index:19;display:flex;flex-direction:column;box-shadow:0 20px 60px #000b;overflow:hidden}
+.chat-head{padding:14px 16px;border-bottom:1px solid #292f39;display:flex;justify-content:space-between;align-items:center;background:#171b23}.chat-head small{color:var(--muted)}
+.chat-body{flex:1;overflow:auto;padding:14px}.msg{margin:8px 0;display:flex}.msg.user{justify-content:flex-end}.bubble{max-width:88%;padding:10px 12px;border-radius:12px;line-height:1.4;font-size:13px;white-space:pre-wrap}.msg.ai .bubble{background:#202631}.msg.user .bubble{background:var(--pink)}
+.chat-input{padding:10px;border-top:1px solid #292f39;display:flex;gap:7px}.chat-input input{flex:1}.chat-input button{padding:9px 11px}.chat-examples{padding:0 14px 10px;color:var(--muted);font-size:11px}.chat-examples span{display:inline-block;border:1px solid #343b46;border-radius:12px;padding:5px 8px;margin:3px;cursor:pointer}
+.chat-panel.hidden,.chat-toggle.hidden{display:none}
+@media(max-width:520px){.chat-panel{right:10px;bottom:70px;width:calc(100vw - 20px);height:70vh}.chat-toggle{right:12px;bottom:12px}}
+
+.analysis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}.analysis-stat{background:#11151c;border:1px solid #303744;border-radius:9px;padding:10px}.analysis-stat small{color:#9da7b5}.analysis-stat b{display:block;font-size:18px;margin-top:5px}.analysis-block{border-top:1px solid #342936;padding:11px 0}.analysis-block h4{margin:0 0 7px}.good{color:#35c98b}.warn{color:#ffd166}.bad{color:#ff716f}.analysis-bar{height:7px;background:#303640;border-radius:99px;overflow:hidden}.analysis-bar span{display:block;height:100%;background:#2d9cdb}.history-edit{padding:6px 9px;font-size:11px}.history-empty{color:#9da7b5;padding:18px}
+@media(max-width:900px){.analysis-grid{grid-template-columns:repeat(2,1fr)}}
+.top-update{display:flex;align-items:center;gap:10px;justify-content:flex-end;margin:0 0 10px;color:#9da7b5;font-size:12px}.top-update button{padding:7px 10px}.top-update #updateStatus{min-width:190px;text-align:left}@media(max-width:650px){.top-update{justify-content:flex-start;flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<header><h1>🪔 AGARBATTI BUSINESS — AI DASHBOARD</h1><div><span class="status" id="status">● Local data ready</span></div></header>
+<button id="chatToggle" class="chat-toggle" onclick="toggleChat()">🤖 Ask AI</button>
+<div id="chatPanel" class="chat-panel hidden">
+  <div class="chat-head"><div><b>🤖 Agarbatti AI</b><br><small>Ask questions or give business commands</small></div><button class="secondary" onclick="toggleChat()">✕</button></div>
+  <div id="chatBody" class="chat-body"></div>
+  <div class="chat-examples"><b>Try:</b><br><span onclick="useExample('show today sales')">today sales</span><span onclick="useExample('show profit')">profit</span><span onclick="useExample('add sale 15000')">add sale ₹15,000</span><span onclick="useExample('update stock 25000')">update stock</span><span onclick="useExample('analyze business')">analyze business</span></div>
+  <div class="chat-input"><input id="chatInput" placeholder="Type a command…" onkeydown="if(event.key==='Enter')sendChat()"><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
+</div>
+<div class="wrap">
+<div class="top-update"><span id="appVersion">Version 1.1</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+
+<section id="dash">
+<div class="grid">
+<div class="card"><div class="label">Total Sales</div><div class="value pink" id="sales">₹0</div></div>
+<div class="card"><div class="label">Net Profit</div><div class="value green" id="profit">₹0</div></div>
+<div class="card"><div class="label">Units Sold</div><div class="value blue" id="units">0</div></div>
+<div class="card"><div class="label">Orders</div><div class="value pink" id="orders">0</div></div>
+<div class="card"><div class="label">Closing Stock</div><div class="value blue" id="stock">0</div></div>
+</div>
+<div class="charts"><div class="chartbox"><canvas id="salesChart"></canvas></div><div class="chartbox"><canvas id="stockChart"></canvas></div></div>
+<div class="section">Recent Daily Data</div><div class="tablebox"><table><thead><tr><th>Date</th><th>Sales</th><th>Orders</th><th>Units</th><th>Production</th><th>Expenses</th><th>Profit</th><th>Stock</th><th>Top Product</th></tr></thead><tbody id="rows"></tbody></table></div>
+</section>
+
+<section id="entry" class="hidden">
+<div class="section">Add Today's Business Data</div>
+<div class="card"><div class="formgrid">
+<div class="field"><label>Date</label><input id="fDate" type="date"></div>
+<div class="field"><label>Sales (₹)</label><input id="fSales" type="number"></div>
+<div class="field"><label>Orders</label><input id="fOrders" type="number"></div>
+<div class="field"><label>Units Sold</label><input id="fUnits" type="number"></div>
+<div class="field"><label>Production</label><input id="fProduction" type="number"></div>
+<div class="field"><label>Raw Material Used (kg)</label><input id="fRaw" type="number" step="0.1"></div>
+<div class="field"><label>Raw Material Purchase (₹)</label><input id="fRawCost" type="number"></div>
+<div class="field"><label>Packaging Cost (₹)</label><input id="fPack" type="number"></div>
+<div class="field"><label>Labour Cost (₹)</label><input id="fLabour" type="number"></div>
+<div class="field"><label>Other Expenses (₹)</label><input id="fOther" type="number"></div>
+<div class="field"><label>Closing Stock</label><input id="fStock" type="number"></div>
+<div class="field"><label>Receivable (₹)</label><input id="fRecv" type="number"></div>
+<div class="field"><label>Payable (₹)</label><input id="fPay" type="number"></div>
+<div class="field"><label>Damaged / Rejected</label><input id="fDamaged" type="number"></div>
+<div class="field"><label>Top Product / Flavour</label><select id="fProduct"></select></div>
+</div>
+<div class="card" style="margin-top:12px;background:#12161d">
+<div class="section" style="margin-top:0">🌸 Flavour Manager</div>
+<div class="actions" style="align-items:center;flex-wrap:wrap">
+<input id="newFlavour" placeholder="Enter new flavour (e.g. Jasmine)" style="max-width:320px">
+<button onclick="addFlavour()">➕ Add New Flavour</button>
+</div>
+<div id="flavourList" style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px"></div>
+<div style="color:#9da7b5;font-size:12px;margin-top:8px">Your flavours are saved on this device and automatically appear in the Daily Entry product list.</div>
+</div>
+<div class="actions"><button onclick="addEntry()">Save Daily Entry</button><button class="secondary" onclick="exportCSV()">Export CSV</button><button class="secondary" onclick="resetData()">Reset Demo Data</button></div></div>
+</section>
+
+<section id="history" class="hidden">
+<div class="section">📅 Entry History</div>
+<div class="card">
+<div class="actions"><input id="historySearch" placeholder="Search by date or product…" oninput="renderHistory()" style="max-width:300px"><button class="secondary" onclick="renderHistory()">Refresh</button></div>
+<div class="tablebox" style="margin-top:12px"><table><thead><tr><th>Date</th><th>Sales</th><th>Orders</th><th>Units</th><th>Production</th><th>Expenses</th><th>Profit</th><th>Stock</th><th>Product</th><th>Action</th></tr></thead><tbody id="historyRows"></tbody></table></div>
+</div></section>
+
+<section id="ai" class="hidden">
+<div class="section">🤖 AI Business Assistant</div>
+<div class="card ai"><div class="actions" style="justify-content:space-between;align-items:center"><div><b>📊 Business Health Report</b><div style="color:#9da7b5;font-size:12px">Analyze your latest data, trends, costs, stock and profit.</div></div><select id="analysisPeriod" style="max-width:150px"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="all">All history</option></select><button onclick="analyzeBusinessNow()">🔎 Analyze Business Now</button></div><div id="insights"></div></div>
+<div class="section">Automation Plan</div><div class="card">
+<div class="insight">📥 Import daily sales, production, expenses and stock automatically.</div>
+<div class="insight">🔎 Detect unusual sales, expenses, stock and profit changes.</div>
+<div class="insight">🔮 Forecast sales and stock requirements.</div>
+<div class="insight">🛒 Generate raw-material purchase suggestions.</div>
+<div class="insight">📩 Generate a daily owner report for email/WhatsApp/Telegram.</div>
+<p style="color:#9da7b5;font-size:12px">This version runs the business analysis locally in your browser. To use a real LLM for natural-language analysis and external messaging, connect an AI API/backend.</p>
+</div>
+</section>
+</div>
+<script>
+const KEY='aggarbattiBusinessData';
+const FLAVOUR_KEY='aggarbattiFlavours_v1';
+const DEFAULT_FLAVOURS=['Rose','Chandan','Mogra','Lavender','Premium Mix'];
+let flavours=JSON.parse(localStorage.getItem(FLAVOUR_KEY)||'null');
+if(!Array.isArray(flavours)||!flavours.length){flavours=[...DEFAULT_FLAVOURS];localStorage.setItem(FLAVOUR_KEY,JSON.stringify(flavours));}
+function renderFlavours(){
+  const select=document.getElementById('fProduct');
+  if(select){const current=select.value;select.innerHTML=flavours.map(f=>`<option>${escapeHTML(f)}</option>`).join('')+'<option value="Other">Other</option>';if(flavours.includes(current))select.value=current;}
+  const list=document.getElementById('flavourList');
+  if(list)list.innerHTML=flavours.map((f,i)=>`<span style="display:inline-flex;align-items:center;gap:5px;background:#202631;border:1px solid #343b46;border-radius:16px;padding:6px 9px;font-size:12px">🌸 ${escapeHTML(f)} <button class="secondary" style="padding:2px 6px;border-radius:10px;font-size:10px" onclick="removeFlavour(${i})">✕</button></span>`).join('');
+}
+function addFlavour(){
+  const el=document.getElementById('newFlavour');let name=(el?.value||'').trim().replace(/\s+/g,' ');
+  if(!name){alert('Please enter a flavour name.');return;}
+  if(flavours.some(f=>f.toLowerCase()===name.toLowerCase())){alert('This flavour already exists.');return;}
+  flavours.push(name);localStorage.setItem(FLAVOUR_KEY,JSON.stringify(flavours));if(el)el.value='';renderFlavours();document.getElementById('fProduct').value=name;
+}
+function removeFlavour(i){
+  if(flavours.length<=1){alert('Keep at least one flavour.');return;}
+  const name=flavours[i];if(!confirm(`Remove ${name} from the flavour list? Existing history will not be deleted.`))return;
+  flavours.splice(i,1);localStorage.setItem(FLAVOUR_KEY,JSON.stringify(flavours));renderFlavours();
+}
+function demo(){let a=[];for(let i=29;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);let sales=Math.round(18000+3500*Math.sin((30-i)/4));let units=Math.round(900+180*Math.sin((30-i)/5));let prod=Math.round(1000+160*Math.sin((30-i)/6));let exp=Math.round(sales*.62);a.push({date:d.toISOString().slice(0,10),sales,orders:Math.max(1,Math.round(units/25)),units,production:prod,raw:25,rawCost:3750,pack:Math.round(units*1.2),labour:Math.round(units*2.2),other:1200,expenses:exp,profit:sales-exp,stock:6500+Math.round((prod-units)*(30-i)/2),recv:Math.round(sales*.18),pay:2250,damaged:Math.round(units*.01),product:['Rose','Chandan','Mogra','Lavender','Premium Mix'][(30-i)%5]});}return a}
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||demo();localStorage.setItem(KEY,JSON.stringify(data));
+renderFlavours();
+let sc,st;
+let cloud=null;
+let cloudReady=false;
+try{
+  if(window.SUPABASE_URL && window.SUPABASE_ANON_KEY && !window.SUPABASE_URL.includes('YOUR_')){
+    cloud=supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY);
+    cloudReady=true;
+  }
+}catch(e){console.warn('Cloud setup error',e)}
+async function loadCloud(){
+  if(!cloudReady)return;
+  const {data:rows,error}=await cloud.from('daily_entries').select('*').order('date',{ascending:true});
+  if(error){console.warn(error);return}
+  if(rows && rows.length){
+    data=rows.map(x=>({date:x.date,sales:x.sales,orders:x.orders,units:x.units,production:x.production,raw:x.raw,rawCost:x.raw_cost,pack:x.pack,labour:x.labour,other:x.other,expenses:x.expenses,profit:x.profit,stock:x.stock,recv:x.recv,pay:x.pay,damaged:x.damaged,product:x.product}));
+    localStorage.setItem(KEY,JSON.stringify(data));
+    render();
+  }
+}
+async function saveCloud(e){
+  if(!cloudReady)return;
+  const row={date:e.date,sales:e.sales,orders:e.orders,units:e.units,production:e.production,raw:e.raw,raw_cost:e.rawCost,pack:e.pack,labour:e.labour,other:e.other,expenses:e.expenses,profit:e.profit,stock:e.stock,recv:e.recv,pay:e.pay,damaged:e.damaged,product:e.product};
+  const {error}=await cloud.from('daily_entries').upsert(row,{onConflict:'date'});
+  if(error)alert('Saved on this device, but cloud save failed: '+error.message);
+  else document.getElementById('status').textContent='● Cloud backup saved';
+}
+const money=n=>'₹'+Math.round(n||0).toLocaleString('en-IN');
+function render(){data.sort((a,b)=>a.date.localeCompare(b.date));let sales=data.reduce((s,x)=>s+x.sales,0),profit=data.reduce((s,x)=>s+x.profit,0),units=data.reduce((s,x)=>s+x.units,0),orders=data.reduce((s,x)=>s+x.orders,0),stock=data.length?data[data.length-1].stock:0;
+document.getElementById('sales').textContent=money(sales);document.getElementById('profit').textContent=money(profit);document.getElementById('units').textContent=units.toLocaleString('en-IN');document.getElementById('orders').textContent=orders.toLocaleString('en-IN');document.getElementById('stock').textContent=stock.toLocaleString('en-IN');
+document.getElementById('rows').innerHTML=data.slice(-12).reverse().map(x=>`<tr><td>${x.date}</td><td>${money(x.sales)}</td><td>${x.orders}</td><td>${x.units}</td><td>${x.production}</td><td>${money(x.expenses)}</td><td>${money(x.profit)}</td><td>${x.stock}</td><td>${x.product}</td></tr>`).join('');
+let labels=data.map(x=>x.date.slice(5)), salesA=data.map(x=>x.sales), profitA=data.map(x=>x.profit), stockA=data.map(x=>x.stock);
+if(sc)sc.destroy();if(st)st.destroy();
+sc=new Chart(document.getElementById('salesChart'),{type:'line',data:{labels,datasets:[{label:'Sales',data:salesA},{label:'Net Profit',data:profitA}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#9da7b5'}},y:{ticks:{color:'#9da7b5'}}}}});
+st=new Chart(document.getElementById('stockChart'),{type:'line',data:{labels,datasets:[{label:'Closing Stock',data:stockA}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#9da7b5'}},y:{ticks:{color:'#9da7b5'}}}}});
+refreshAI();renderHistory()}
+async function addEntry(){let g=id=>document.getElementById(id).value;let sales=+g('fSales')||0,exp=(+g('fRawCost')||0)+(+g('fPack')||0)+(+g('fLabour')||0)+(+g('fOther')||0);let e={date:g('fDate')||new Date().toISOString().slice(0,10),sales,orders:+g('fOrders')||0,units:+g('fUnits')||0,production:+g('fProduction')||0,raw:+g('fRaw')||0,rawCost:+g('fRawCost')||0,pack:+g('fPack')||0,labour:+g('fLabour')||0,other:+g('fOther')||0,expenses:exp,profit:sales-exp,stock:+g('fStock')||0,recv:+g('fRecv')||0,pay:+g('fPay')||0,damaged:+g('fDamaged')||0,product:g('fProduct')};let idx=data.findIndex(x=>x.date===e.date);if(idx>=0)data[idx]=e;else data.push(e);localStorage.setItem(KEY,JSON.stringify(data));render();await saveCloud(e);showTab('dash',document.querySelector('.tab'));alert(cloudReady?'Daily data saved to device + cloud.':'Daily data saved to this device. Connect cloud settings for automatic backup.')}
+function refreshAI(){let el=document.getElementById('insights');if(!el)return;if(!data.length){el.innerHTML='<div class="insight">Add daily data to analyze your business.</div>';return}let d=[...data].sort((a,b)=>a.date.localeCompare(b.date));let last=d[d.length-1],prev=d.slice(-8,-1),avgSales=prev.length?prev.reduce((s,x)=>s+x.sales,0)/prev.length:last.sales;let margin=last.sales?last.profit/last.sales*100:0;let avgUnits=prev.length?prev.reduce((s,x)=>s+x.units,0)/prev.length:last.units;let msgs=[];
+msgs.push(`📊 <b>Latest day:</b> ${money(last.sales)} sales, ${money(last.profit)} profit, ${last.units.toLocaleString('en-IN')} packets sold.`);
+msgs.push(`${last.sales>=avgSales?'📈 Sales are above':'📉 Sales are below'} the recent average of ${money(avgSales)}.`);
+msgs.push(`💰 <b>Profit margin:</b> ${margin.toFixed(1)}%. ${margin<20?'Review raw-material, labour and packaging costs.':'Keep monitoring cost per packet.'}`);
+if(last.stock<3000)msgs.push('🚨 <b>Low stock alert:</b> closing stock is below 3,000 packets.');
+else msgs.push(`📦 Stock position: ${last.stock.toLocaleString('en-IN')} packets.`);
+if(last.units<avgUnits*.8)msgs.push('⚠️ Units sold are significantly below the recent average; review demand and customer follow-ups.');
+if(last.damaged>last.units*.03)msgs.push('⚠️ Rejection/damage rate is high; check production quality and packaging.');
+msgs.push(`🛒 <b>Next action:</b> compare top product (${last.product}) sales with stock before tomorrow's production.`);
+el.innerHTML=msgs.map(x=>`<div class="insight">${x}</div>`).join('')}
+function toggleChat(){document.getElementById('chatPanel').classList.toggle('hidden');document.getElementById('chatToggle').classList.toggle('hidden');if(!document.getElementById('chatBody').children.length){addChat('ai','Hi! I can read your dashboard and understand natural-language business questions. Try “How was my business this week?”, “Why did profit fall?”, “show today sales”, or “আজকের বিক্রি কত?”')}}
+function addChat(who,text){let b=document.getElementById('chatBody');let m=document.createElement('div');m.className='msg '+who;let bubble=document.createElement('div');bubble.className='bubble';bubble.innerHTML=String(text).replace(/\n/g,'<br>');m.appendChild(bubble);b.appendChild(m);b.scrollTop=b.scrollHeight}
+function useExample(t){document.getElementById('chatInput').value=t;sendChat()}
+function todayEntry(){let t=new Date().toISOString().slice(0,10);return data.find(x=>x.date===t)||null}
+function commandResponse(raw){let q=raw.toLowerCase().trim();let t=new Date().toISOString().slice(0,10);let e=todayEntry();
+ if(q.includes('analyze')||q.includes('analysis')||q.includes('business report')){refreshAI();let el=document.getElementById('insights');let txt=[...el.querySelectorAll('.insight')].map(x=>x.innerText).join('\n');return 'Business analysis:\n'+txt}
+ if(q.includes('today')&&(q.includes('sale')||q.includes('sales'))){return e?`Today (${e.date}) sales: ${money(e.sales)}\nOrders: ${e.orders}\nUnits: ${e.units}`:'No entry for today yet.'}
+ if(q.includes('profit')){if(e)return `Today profit: ${money(e.profit)}\nProfit margin: ${e.sales?(e.profit/e.sales*100).toFixed(1):0}%`;let total=data.reduce((s,x)=>s+x.profit,0);return `Total recorded profit: ${money(total)}`}
+ if(q.includes('stock')){return e?`Current stock: ${Number(e.stock||0).toLocaleString('en-IN')} packets.`:'No stock entry for today.'}
+ if(q.includes('sales')){let total=data.reduce((s,x)=>s+x.sales,0);return `Total recorded sales: ${money(total)}.`}
+ let n=q.match(/(?:add|record|enter|update)\s+(?:a\s+)?(?:sale|sales)\s*(?:₹|rs\.?|inr)?\s*([\d,]+(?:\.\d+)?)/i);if(n){let amount=Number(n[1].replace(/,/g,''));if(!amount)return 'Please give a valid sale amount.';let x=e?{...e}:{date:t,sales:0,orders:0,units:0,production:0,raw:0,rawCost:0,pack:0,labour:0,other:0,expenses:0,profit:0,stock:0,recv:0,pay:0,damaged:0,product:'Rose'};x.sales=amount;x.profit=x.sales-x.expenses;let idx=data.findIndex(z=>z.date===t);if(idx>=0)data[idx]=x;else data.push(x);localStorage.setItem(KEY,JSON.stringify(data));render();saveCloud(x);return `Done. Today's sales updated to ${money(amount)}. Cloud save will run if connected.`}
+ let st=q.match(/(?:update|set|change)\s+(?:the\s+)?stock\s*(?:to|=)?\s*([\d,]+)/i);if(st){let amount=Number(st[1].replace(/,/g,''));let x=e?{...e}:{date:t,sales:0,orders:0,units:0,production:0,raw:0,rawCost:0,pack:0,labour:0,other:0,expenses:0,profit:0,stock:0,recv:0,pay:0,damaged:0,product:'Rose'};x.stock=amount;let idx=data.findIndex(z=>z.date===t);if(idx>=0)data[idx]=x;else data.push(x);localStorage.setItem(KEY,JSON.stringify(data));render();saveCloud(x);return `Done. Today's stock updated to ${amount.toLocaleString('en-IN')}.`}
+ if(q.includes('dashboard')||q.includes('open dashboard')){showTab('dash',document.querySelector('.tab'));return 'Dashboard opened.'}
+ if(q.includes('daily entry')||q.includes('entry')){showTab('entry',document.querySelectorAll('.tab')[1]);return 'Daily Entry opened.'}
+ if(q==='help'||q.includes('what can you do'))return 'I can:\n• Show today sales, profit and stock\n• Show total sales\n• Add/update a sale amount\n• Update today stock\n• Open Dashboard or Daily Entry\n• Analyze the business\nFor full natural-language AI, connect an AI backend/API securely.'
+ return null}
+async function sendChat(){let input=document.getElementById('chatInput');let q=input.value.trim();if(!q)return;addChat('user',q);input.value='';let answer=commandResponse(q);if(answer!==null){addChat('ai',answer);return}addChat('ai','Thinking…');try{let r=await askRealAI(q);let msgs=document.querySelectorAll('#chatBody .msg.ai .bubble');if(msgs.length)msgs[msgs.length-1].innerHTML=escapeHTML(r).replace(/\n/g,'<br>')}catch(err){let msgs=document.querySelectorAll('#chatBody .msg.ai .bubble');if(msgs.length)msgs[msgs.length-1].innerHTML='AI connection failed: '+escapeHTML(err.message)+'<br><small>Check your Supabase Edge Function and OpenAI API secret.</small>'}}
+function escapeHTML(s){return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]))}
+async function askRealAI(message){if(!cloudReady)throw new Error('Connect Supabase first.');let base=window.SUPABASE_URL.replace(/\/$/,'');let fn=window.AI_FUNCTION_NAME||'ai-chat';let url=base+'/functions/v1/'+fn;let headers={'Content-Type':'application/json','apikey':window.SUPABASE_ANON_KEY,'Authorization':'Bearer '+window.SUPABASE_ANON_KEY};let r=await fetch(url,{method:'POST',headers,body:JSON.stringify({message,businessData:data})});let body=await r.json();if(!r.ok||body.error)throw new Error(body.error||'AI request failed');return body.reply||'No AI response.'}
+function voiceCommand(){if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){addChat('ai','Voice input is not supported in this browser.');return}let R=window.SpeechRecognition||window.webkitSpeechRecognition;let r=new R();r.lang='en-IN';r.onresult=e=>{document.getElementById('chatInput').value=e.results[0][0].transcript;sendChat()};r.start()}
+
+function renderHistory(){let body=document.getElementById('historyRows');if(!body)return;let q=(document.getElementById('historySearch')?.value||'').toLowerCase();let list=[...data].sort((a,b)=>b.date.localeCompare(a.date)).filter(x=>!q||x.date.toLowerCase().includes(q)||(x.product||'').toLowerCase().includes(q));if(!list.length){body.innerHTML='<tr><td colspan="10" class="history-empty">No past entries found.</td></tr>';return}body.innerHTML=list.map(x=>`<tr><td>${x.date}</td><td>${money(x.sales)}</td><td>${x.orders}</td><td>${x.units}</td><td>${x.production}</td><td>${money(x.expenses)}</td><td>${money(x.profit)}</td><td>${x.stock}</td><td>${x.product||''}</td><td><button class="history-edit" onclick="editEntry('${x.date}')">Edit</button></td></tr>`).join('')}
+function editEntry(date){let x=data.find(e=>e.date===date);if(!x)return;let map={fDate:x.date,fSales:x.sales,fOrders:x.orders,fUnits:x.units,fProduction:x.production,fRaw:x.raw,fRawCost:x.rawCost,fPack:x.pack,fLabour:x.labour,fOther:x.other,fStock:x.stock,fRecv:x.recv,fPay:x.pay,fDamaged:x.damaged,fProduct:x.product};Object.entries(map).forEach(([id,v])=>{let el=document.getElementById(id);if(el)el.value=v??''});showTab('entry',document.querySelectorAll('.tab')[1]);}
+function analyzeBusinessNow(){let el=document.getElementById('insights');if(!el)return;if(!data.length){el.innerHTML='<div class="insight">📝 No entries yet. Add your first Daily Entry, then press Analyze Business Now.</div>';return}let period=document.getElementById('analysisPeriod')?.value||'30';let d=[...data].sort((a,b)=>a.date.localeCompare(b.date));if(period!=='all'){let n=Number(period);d=d.slice(-n)}let sales=d.reduce((s,x)=>s+Number(x.sales||0),0),exp=d.reduce((s,x)=>s+Number(x.expenses||0),0),profit=d.reduce((s,x)=>s+Number(x.profit||0),0),units=d.reduce((s,x)=>s+Number(x.units||0),0),orders=d.reduce((s,x)=>s+Number(x.orders||0),0),prod=d.reduce((s,x)=>s+Number(x.production||0),0),dam=d.reduce((s,x)=>s+Number(x.damaged||0),0);let margin=sales?profit/sales*100:0;let last=d[d.length-1],prev=d.length>1?d[d.length-2]:null;let change=prev&&prev.sales?((last.sales-prev.sales)/prev.sales*100):null;let productMap={};d.forEach(x=>{let p=x.product||'Unknown';productMap[p]=(productMap[p]||0)+Number(x.sales||0)});let top=Object.entries(productMap).sort((a,b)=>b[1]-a[1])[0];let warnings=[];if(margin<15)warnings.push('<span class="bad">⚠ Profit margin is below 15% — review raw-material, labour and packaging costs.</span>');else warnings.push('<span class="good">✓ Profit margin is '+margin.toFixed(1)+'%.</span>');if(exp>sales*.7)warnings.push('<span class="warn">⚠ Expenses are above 70% of sales.</span>');if(last.stock<3000)warnings.push('<span class="warn">⚠ Latest stock is below 3,000 units.</span>');if(dam>units*.03)warnings.push('<span class="warn">⚠ Damaged/rejected units are above 3% of units sold.</span>');if(prod>units*1.2)warnings.push('📦 Production is considerably higher than sales — stock may be building.');if(units>prod*1.2)warnings.push('📦 Sales are considerably higher than production — monitor stock availability.');let advice=[];if(change!==null)advice.push((change>=0?'📈':'📉')+' Latest sales changed '+Math.abs(change).toFixed(1)+'% '+(change>=0?'up':'down')+' versus the previous recorded day.');if(top)advice.push('🏷 Top recorded product by sales value: '+escapeHTML(top[0])+' ('+money(top[1])+').');advice.push('🛒 Use the latest stock and sales trend before planning tomorrow’s production.');el.innerHTML='<div class="analysis-grid"><div class="analysis-stat"><small>Period Sales</small><b>'+money(sales)+'</b></div><div class="analysis-stat"><small>Expenses</small><b>'+money(exp)+'</b></div><div class="analysis-stat"><small>Profit</small><b class="'+(profit>=0?'good':'bad')+'">'+money(profit)+'</b></div><div class="analysis-stat"><small>Profit Margin</small><b>'+margin.toFixed(1)+'%</b></div></div><div class="analysis-block"><h4>📌 Business health</h4>'+warnings.map(x=>'<div class="insight">'+x+'</div>').join('')+'</div><div class="analysis-block"><h4>📈 Trends & activity</h4><div class="insight">'+d.length+' day(s) analyzed • '+orders.toLocaleString('en-IN')+' orders • '+units.toLocaleString('en-IN')+' units sold • '+prod.toLocaleString('en-IN')+' produced.</div>'+advice.map(x=>'<div class="insight">'+x+'</div>').join('')+'</div><div class="analysis-block"><h4>💡 Recommended next actions</h4><div class="insight">1. Keep daily entries updated so the trend becomes more accurate.</div><div class="insight">2. Check the largest expense category before changing prices.</div><div class="insight">3. Review stock against the latest sales pace before production.</div></div><div class="analysis-block"><small>Analysis is based only on the saved entries in this dashboard.</small></div>'}
+function exportCSV(){let h=['Date','Sales','Orders','Units','Production','Raw Material kg','Raw Purchase','Packaging','Labour','Other Expenses','Total Expenses','Net Profit','Stock','Receivable','Payable','Damaged','Top Product'];let rows=data.map(x=>[x.date,x.sales,x.orders,x.units,x.production,x.raw,x.rawCost,x.pack,x.labour,x.other,x.expenses,x.profit,x.stock,x.recv,x.pay,x.damaged,x.product]);let csv=[h,...rows].map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='aggarbatti-business-data.csv';a.click()}
+function resetData(){if(confirm('Reset to demo data?')){data=demo();localStorage.setItem(KEY,JSON.stringify(data));render()}}
+function showTab(id,btn){['dash','entry','history','ai'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==id)); if(id==='history')renderHistory();document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active')}
+
+// Online update system: when this app is hosted online, the service worker checks the
+// server for a newer version. Users do not need to download a new ZIP.
+const APP_VERSION='1.1';
+async function checkForUpdates(){
+  const status=document.getElementById('updateStatus');
+  if(status) status.textContent='Checking…';
+  try{
+    if(!('serviceWorker' in navigator)){if(status)status.textContent='Updates require an online hosted site.';return;}
+    const reg=await navigator.serviceWorker.getRegistration();
+    if(!reg){if(status)status.textContent='Update system will activate after the site is hosted securely (HTTPS).';return;}
+    await reg.update();
+    if(reg.waiting){
+      if(status)status.textContent='New update found — applying…';
+      reg.waiting.postMessage({type:'SKIP_WAITING'});
+      reg.addEventListener('controllerchange',()=>window.location.reload(),{once:true});
+    }else{
+      if(status)status.textContent='✓ You are using the latest version.';
+    }
+  }catch(e){if(status)status.textContent='Update check failed. Try again.';}
+}
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+
+document.getElementById('fDate').value=new Date().toISOString().slice(0,10);render();loadCloud();
+</script>
+</body></html>
