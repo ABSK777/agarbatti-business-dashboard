@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,39 +10,48 @@ const corsHeaders = {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
-    const { message, businessData } = await req.json();
-    if (!message) throw new Error("Message is required");
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) throw new Error("Authentication required.");
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
     const apiKey = Deno.env.get("OPENAI_API_KEY");
+    if (!supabaseUrl || !anonKey) throw new Error("Supabase environment is not configured.");
     if (!apiKey) throw new Error("OPENAI_API_KEY is not configured in Supabase secrets.");
-    const model = Deno.env.get("OPENAI_MODEL") || "gpt-5.6-luna";
 
-    const safeData = Array.isArray(businessData) ? businessData.slice(-90) : [];
-    const instructions = `You are the AI business assistant for an Agarbatti (incense-stick) business in India.
-Answer the owner's questions using the supplied dashboard data. Be practical, concise, and clear.
-You can speak English, Hindi, or Bengali; reply in the language the owner uses.
-Do not invent numbers. If data is missing, say so.
-You may analyze sales, profit, expenses, production, stock, receivables, payables, damaged units, and products.
-For commands that would change data, explain what should be changed, but do not claim that you changed database records unless the app confirms the action.
+    const supabase = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) throw new Error("Invalid or expired session.");
+
+    const { data: rows, error: dataError } = await supabase
+      .from("daily_entries")
+      .select("date,sales,orders,units,production,raw,raw_cost,pack,labour,other,expenses,profit,stock,recv,pay,damaged,product")
+      .eq("user_id", user.id)
+      .order("date", { ascending: false })
+      .limit(90);
+    if (dataError) throw new Error("Could not load your business data.");
+
+    const { message } = await req.json();
+    if (!message) throw new Error("Message is required.");
+
+    const model = Deno.env.get("OPENAI_MODEL") || "gpt-5.6-luna";
+    const instructions = `You are the AI business assistant for an Agarbatti business in India.
+Use only the supplied business records. Do not invent numbers.
+Reply in the language used by the owner (English, Hindi, or Bengali).
+Be concise and practical. Analyze sales, profit, expenses, production, stock, receivables, payables, damaged units, and products.
+You may suggest actions, but do not claim that you changed records.
 Currency is Indian rupees (₹). Dates are YYYY-MM-DD.
 
-Dashboard data (latest records):
-${JSON.stringify(safeData)}`;
+Latest business records:
+${JSON.stringify((rows || []).reverse())}`;
 
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        instructions,
-        input: message,
-        max_output_tokens: 700,
-      }),
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+      body: JSON.stringify({ model, instructions, input: message, max_output_tokens: 700 }),
     });
-
     const body = await response.json();
     if (!response.ok) throw new Error(body?.error?.message || "OpenAI request failed");
 
@@ -50,8 +60,7 @@ ${JSON.stringify(safeData)}`;
     });
   } catch (error) {
     return new Response(JSON.stringify({ error: error?.message || String(error) }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
