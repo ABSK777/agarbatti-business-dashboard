@@ -36,18 +36,19 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 .theme-control{width:auto;min-width:128px;padding:8px 10px;border-color:#343b46;background:#11151c;font-size:12px}
 @media(max-width:520px){.chat-panel{right:10px;bottom:70px;width:calc(100vw - 20px);height:70vh}.chat-toggle{right:12px;bottom:12px}}
 
-.khata-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
-.khata-modal{position:fixed;inset:0;background:#000b;z-index:50;padding:20px;overflow:auto;display:flex;align-items:center;justify-content:center}
-.khata-dialog{width:min(1120px,100%);max-height:95vh;overflow:auto;background:#11151c;border:1px solid #39414d;border-radius:16px;box-shadow:0 25px 80px #000e;padding:18px}
-.khata-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid #292f39}
-.khata-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:14px 0}
-.khata-stat{background:#181d25;border:1px solid #303744;border-radius:10px;padding:12px}.khata-stat small{display:block;color:#9da7b5}.khata-stat b{display:block;font-size:19px;margin-top:5px}
-.khata-filter{display:grid;grid-template-columns:1fr 1fr 2fr;gap:9px;margin:14px 0}
-.khata-editor{background:#171b23;border:1px solid #343b46;border-radius:10px;padding:12px;margin:12px 0}
-.khata-ledger-box{max-height:50vh}.khata-ledger-box th{top:0}
-.khata-modal.hidden{display:none}
-@media(max-width:900px){.khata-stats,.khata-summary{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.khata-stats,.khata-summary,.khata-filter{grid-template-columns:1fr 1fr}.khata-dialog{padding:12px}.khata-modal{padding:8px}}
+.khata-modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:50;display:flex;align-items:center;justify-content:center;padding:14px}
+.khata-phone{width:min(100%,470px);height:min(94vh,850px);background:#f7f8fa;color:#20252b;border-radius:20px;overflow:hidden;box-shadow:0 28px 90px #000b;display:flex;flex-direction:column;border:1px solid #dfe3e8}
+.kb-topbar{height:68px;background:#fff;border-bottom:1px solid #e5e8ec;display:flex;align-items:center;gap:10px;padding:10px 12px;flex:0 0 auto}.kb-icon{background:transparent!important;color:#20252b!important;font-size:28px;padding:4px 8px;min-width:38px}.kb-head-main{display:flex;align-items:center;gap:10px;flex:1;min-width:0}.kb-avatar{height:40px;width:40px;border-radius:50%;background:#e8edf3;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px}.kb-name{font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kb-sub{font-size:11px;color:#7c858f;margin-top:2px}
+.kb-balance-card{background:#fff;padding:22px 20px 16px;border-bottom:1px solid #e5e8ec;text-align:center}.kb-balance-label{font-size:10px;letter-spacing:1.2px;color:#8b949e;font-weight:800}.kb-balance-value{font-size:34px;font-weight:900;letter-spacing:-.5px;margin-top:4px}.kb-balance-note{font-size:12px;color:#6f7882;margin-top:2px}.kb-split{display:grid;grid-template-columns:1fr 1fr;margin-top:18px;border-top:1px solid #edf0f3;padding-top:14px}.kb-split>div:first-child{border-right:1px solid #edf0f3}.kb-split span{display:block;font-size:9px;color:#89929c;font-weight:800;letter-spacing:.7px}.kb-split b{display:block;font-size:17px;margin-top:4px}.kb-split>div:first-child b{color:#1d9d67}.kb-split>div:last-child b{color:#d64c4c}
+.kb-entry-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#f7f8fa;padding:14px 14px 10px}.kb-entry-actions button{border-radius:12px;padding:12px 10px;text-align:left;border:1px solid #e0e4e8;box-shadow:0 2px 5px #0000000d}.kb-entry-actions span{font-size:19px;display:inline-block;margin-right:7px}.kb-entry-actions strong{font-size:13px}.kb-entry-actions small{display:block;color:#6f7882;font-size:10px;margin-top:4px;padding-left:28px}.kb-gave{background:#fff!important;color:#c94747!important}.kb-got{background:#fff!important;color:#1d9362!important}
+.kb-tabs{display:flex;gap:7px;background:#f7f8fa;padding:7px 14px 12px;border-bottom:1px solid #e5e8ec;overflow:auto}.kb-filter{white-space:nowrap;padding:8px 13px;border-radius:20px;background:#fff!important;color:#69727d!important;border:1px solid #e0e4e8!important;font-size:11px}.kb-filter.active{background:#202c46!important;color:#fff!important;border-color:#202c46!important}
+.kb-list-head{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:12px 15px 8px;font-size:10px;font-weight:800;letter-spacing:.8px;color:#7e8791}.kb-small{background:transparent!important;color:#6d7680!important;padding:4px 6px;font-size:14px}
+.kb-date-filters{background:#fff;padding:9px 14px;border-bottom:1px solid #e5e8ec;display:grid;grid-template-columns:1fr 1fr;gap:7px}.kb-date-filters .field:last-child{grid-column:1/-1}.kb-date-filters input{background:#f7f8fa;color:#20252b;border-color:#d9dee4;padding:7px;font-size:11px}.kb-date-filters.hidden{display:none}
+.kb-ledger-scroll{background:#fff;overflow:auto;flex:1;min-height:0}.kb-txn{display:flex;gap:10px;padding:13px 15px;border-bottom:1px solid #edf0f3;align-items:flex-start}.kb-txn-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-weight:900}.kb-txn-dot.gave{background:#fff0f0;color:#d64c4c}.kb-txn-dot.got{background:#ebf9f2;color:#1d9d67}.kb-txn-main{min-width:0;flex:1}.kb-txn-title{font-size:13px;font-weight:800}.kb-txn-note{font-size:10px;color:#89929c;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kb-txn-date{font-size:10px;color:#9098a1;margin-top:4px}.kb-txn-amt{text-align:right;white-space:nowrap}.kb-txn-amt b{display:block;font-size:14px}.kb-txn-amt small{display:block;font-size:9px;color:#9098a1;margin-top:3px}.kb-txn-actions{display:flex;gap:3px;margin-top:4px}.kb-txn-actions button{background:transparent!important;color:#8a939d!important;padding:1px 3px;font-size:10px}
+.kb-bottom-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px;background:#fff;border-top:1px solid #e5e8ec}.kb-bottom-actions button{border-radius:10px;padding:11px;font-size:12px}.kb-reminder{background:#1d9d67!important}.kb-report{background:#fff!important;color:#454d56!important;border:1px solid #d9dee4!important}.kb-more-actions{display:flex;gap:6px;padding:0 14px 12px;background:#fff;overflow:auto}.kb-more-actions button{white-space:nowrap;padding:7px 9px;font-size:10px}
+.khata-phone .khata-editor{background:#f7f8fa;border:0;border-top:1px solid #e5e8ec;border-bottom:1px solid #e5e8ec;border-radius:0;margin:0;padding:12px;color:#20252b}.khata-phone .khata-editor input,.khata-phone .khata-editor select{background:#fff;color:#20252b;border-color:#d7dce2}.khata-modal.hidden{display:none}
+@media(max-width:520px){.khata-modal{padding:0}.khata-phone{width:100%;height:100vh;max-height:none;border-radius:0;border:0}.kb-topbar{height:62px}.kb-balance-card{padding-top:18px}.kb-balance-value{font-size:30px}}
+@media(min-width:521px){.khata-phone{border-radius:22px}}
 @media print{
  body.printing-khata>*{display:none!important}
  body.printing-khata #khataModal{display:block!important;position:static!important;padding:0!important;background:#fff!important}
@@ -74,7 +75,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><input id="chatInput" placeholder="Type a command…" onkeydown="if(event.key==='Enter')sendChat()"><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 2.0</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 2.1</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -187,32 +188,38 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 <div class="tablebox"><table style="min-width:1050px"><thead><tr><th>Date</th><th>Person</th><th>Entry</th><th>Amount</th><th>Paid / Received</th><th>Due</th><th>Note</th><th>Action</th></tr></thead><tbody id="transactionRows"></tbody></table></div>
 
 <div id="khataModal" class="khata-modal hidden" onclick="if(event.target===this)closePartyLedger()">
-  <div class="khata-dialog">
-    <div class="khata-head">
-      <div><div id="khataTitle" style="font-size:20px;font-weight:800"></div><div id="khataSub" style="color:#9da7b5;font-size:12px;margin-top:3px"></div></div>
-      <button class="secondary" onclick="closePartyLedger()">✕</button>
+  <div class="khata-phone">
+    <div class="kb-topbar">
+      <button class="kb-icon" onclick="closePartyLedger()" aria-label="Back">‹</button>
+      <div class="kb-head-main"><div class="kb-avatar" id="khataAvatar">A</div><div><div id="khataTitle" class="kb-name"></div><div id="khataSub" class="kb-sub"></div></div></div>
+      <button class="kb-icon" onclick="startEditPartyAccount()" aria-label="Edit">✎</button>
     </div>
-    <div class="khata-summary" id="khataSummary"></div>
-    <div class="actions" style="flex-wrap:wrap">
-      <button onclick="quickPartyAction('sale')">➕ Sale</button>
-      <button onclick="quickPartyAction('purchase')" class="secondary">📦 Purchase</button>
-      <button onclick="quickPartyAction('received')" class="secondary">💵 Receive</button>
-      <button onclick="quickPartyAction('paid')" class="secondary">💸 Pay</button>
-      <button onclick="startEditPartyAccount()" class="secondary">✏️ Edit Account</button>
+    <div class="kb-balance-card">
+      <div class="kb-balance-label">BALANCE</div>
+      <div id="kbNetBalance" class="kb-balance-value">₹0</div>
+      <div id="kbBalanceText" class="kb-balance-note">Settled</div>
+      <div class="kb-split"><div><span>YOU WILL GET</span><b id="kbGet">₹0</b></div><div><span>YOU WILL GIVE</span><b id="kbGive">₹0</b></div></div>
     </div>
-    <div class="khata-filter">
-      <div class="field"><label>From</label><input id="khataFrom" type="date" onchange="renderKhataLedger()"></div>
-      <div class="field"><label>To</label><input id="khataTo" type="date" onchange="renderKhataLedger()"></div>
-      <div class="field"><label>Search Note</label><input id="khataSearch" placeholder="Search details" oninput="renderKhataLedger()"></div>
+    <div class="kb-entry-actions">
+      <button class="kb-gave" onclick="quickPartyAction('sale')"><span>↑</span><strong>You Gave</strong><small>Credit / Sale</small></button>
+      <button class="kb-got" onclick="quickPartyAction('received')"><span>↓</span><strong>You Got</strong><small>Payment / Received</small></button>
+    </div>
+    <div class="kb-tabs">
+      <button class="kb-filter active" id="kbFilterAll" onclick="setKhataFilter('all')">All</button>
+      <button class="kb-filter" id="kbFilterGave" onclick="setKhataFilter('gave')">You Gave</button>
+      <button class="kb-filter" id="kbFilterGot" onclick="setKhataFilter('got')">You Got</button>
+      <button class="kb-filter" id="kbFilterSettled" onclick="setKhataFilter('settled')">Settled</button>
     </div>
     <div id="khataEditor" class="khata-editor hidden"></div>
-    <div class="tablebox khata-ledger-box"><table style="min-width:850px"><thead><tr><th>Date</th><th>Details</th><th>Amount</th><th>Paid / Payment</th><th>Balance</th><th>Action</th></tr></thead><tbody id="khataLedgerRows"></tbody></table></div>
-    <div class="actions" style="justify-content:flex-end;flex-wrap:wrap;margin-top:12px">
-      <button class="secondary" onclick="exportPartyStatement()">⬇️ Export Statement</button>
-      <button class="secondary" onclick="sharePartyStatement()">📲 WhatsApp / Share</button>
-      <button class="secondary" onclick="printPartyStatement()">🖨️ Print</button>
-      <button class="secondary" onclick="deletePartyAccount()">🗑️ Delete Account</button>
+    <div class="kb-list-head"><span>TRANSACTIONS</span><button class="kb-small" onclick="openPartyFilters()">⚙</button></div>
+    <div class="kb-date-filters hidden" id="kbDateFilters">
+      <div class="field"><label>From</label><input id="khataFrom" type="date" onchange="renderKhataLedger()"></div>
+      <div class="field"><label>To</label><input id="khataTo" type="date" onchange="renderKhataLedger()"></div>
+      <div class="field"><label>Search</label><input id="khataSearch" placeholder="Search note" oninput="renderKhataLedger()"></div>
     </div>
+    <div class="kb-ledger-scroll"><div id="khataLedgerRows"></div></div>
+    <div class="kb-bottom-actions"><button class="kb-reminder" onclick="sharePartyStatement()">📲 Send Reminder</button><button class="kb-report" onclick="printPartyStatement()">View Report</button></div>
+    <div class="kb-more-actions"><button class="secondary" onclick="quickPartyAction('purchase')">📦 Purchase</button><button class="secondary" onclick="quickPartyAction('paid')">💸 Payment Paid</button><button class="secondary" onclick="exportPartyStatement()">⬇️ Export</button><button class="secondary" onclick="deletePartyAccount()">🗑️ Delete</button></div>
   </div>
 </div>
 </section>
@@ -412,41 +419,53 @@ async function addPartyPayment(){
 }
 function todayISO(){return new Date().toISOString().slice(0,10)}
 function closePartyLedger(){const m=document.getElementById('khataModal');if(m)m.classList.add('hidden');activeLedgerPartyId=null;khataEditKind=null;khataEditId=null;}
-function openPartyLedger(id){
- const p=parties.find(x=>x.id===id);if(!p)return;
- activeLedgerPartyId=id;khataEditKind=null;khataEditId=null;
- const m=document.getElementById('khataModal');m.classList.remove('hidden');
- document.getElementById('khataTitle').textContent='📖 '+p.name;
- document.getElementById('khataSub').textContent=(p.phone?p.phone+' • ':'')+p.party_type.toUpperCase();
- const all=partyLedgerEntries(p);
- const first=all.filter(x=>x.kind!=='opening').map(x=>x.date).sort()[0],last=all.filter(x=>x.kind!=='opening').map(x=>x.date).sort().slice(-1)[0];
- document.getElementById('khataFrom').value=first||'';document.getElementById('khataTo').value=last||'';document.getElementById('khataSearch').value='';
+let khataFilter='all';
+function openPartyFilters(){const e=document.getElementById('kbDateFilters');if(e)e.classList.toggle('hidden');}
+function setKhataFilter(v){
+ khataFilter=v;
+ ['All','Gave','Got','Settled'].forEach(x=>{const el=document.getElementById('kbFilter'+x);if(el)el.classList.toggle('active',(v==='all'&&x==='All')||(v==='gave'&&x==='Gave')||(v==='got'&&x==='Got')||(v==='settled'&&x==='Settled'));});
  renderKhataLedger();
 }
+function openPartyLedger(id){
+ const p=parties.find(x=>x.id===id);if(!p)return;
+ activeLedgerPartyId=id;khataEditKind=null;khataEditId=null;khataFilter='all';
+ document.getElementById('khataModal').classList.remove('hidden');
+ document.getElementById('khataTitle').textContent=p.name;
+ document.getElementById('khataSub').textContent=(p.phone||'')+(p.phone?' • ':'')+p.party_type.toUpperCase();
+ document.getElementById('khataAvatar').textContent=(p.name||'A').trim().charAt(0).toUpperCase();
+ const dates=partyLedgerEntries(p).filter(x=>x.kind!=='opening').map(x=>x.date).sort();
+ document.getElementById('khataFrom').value=dates[0]||'';document.getElementById('khataTo').value=dates.slice(-1)[0]||'';document.getElementById('khataSearch').value='';
+ setKhataFilter('all');
+}
 function partyLedgerEntries(p){
- const rows=[];
- const opening=Number(p.opening_balance||0)*(p.party_type==='supplier'?-1:1);
- if(opening)rows.push({kind:'opening',id:0,date:'0000-00-00',details:'Opening Balance',amount:Math.abs(opening),payment:0,signed:opening,note:'Opening balance'});
- partyTransactions.filter(x=>x.party_id===p.id).forEach(x=>{
-   const due=Number(x.due||0),signed=(x.txn_type==='sell'?1:-1)*due;
-   rows.push({kind:'tx',id:x.id,date:x.txn_date,details:x.txn_type==='sell'?'🧾 Credit Sale':'📦 Credit Purchase',amount:Number(x.amount||0),payment:Number(x.paid||0),signed,note:x.notes||''});
- });
- partyPayments.filter(x=>x.party_id===p.id).forEach(x=>{
-   const signed=x.direction==='received'?-Number(x.amount||0):Number(x.amount||0);
-   rows.push({kind:'pay',id:x.id,date:x.payment_date,details:x.direction==='received'?'💵 Money Received':'💸 Money Paid',amount:Number(x.amount||0),payment:Number(x.amount||0),signed,note:x.notes||''});
- });
+ const rows=[],opening=Number(p.opening_balance||0)*(p.party_type==='supplier'?-1:1);
+ if(opening)rows.push({kind:'opening',id:0,date:'0000-00-00',details:'Opening Balance',amount:Math.abs(opening),payment:0,signed:opening,note:'Balance brought forward'});
+ partyTransactions.filter(x=>x.party_id===p.id).forEach(x=>{const due=Number(x.due||0),signed=(x.txn_type==='sell'?1:-1)*due;rows.push({kind:'tx',id:x.id,date:x.txn_date,details:x.txn_type==='sell'?'Sale / You Gave':'Purchase / You Got',amount:Number(x.amount||0),payment:Number(x.paid||0),signed,note:x.notes||'',txType:x.txn_type});});
+ partyPayments.filter(x=>x.party_id===p.id).forEach(x=>{const a=Number(x.amount||0),signed=x.direction==='received'?-a:a;rows.push({kind:'pay',id:x.id,date:x.payment_date,details:x.direction==='received'?'Payment Received / You Got':'Payment Paid / You Gave',amount:a,payment:a,signed,note:x.notes||'',direction:x.direction});});
  rows.sort((a,b)=>String(a.date).localeCompare(String(b.date))||((a.kind==='opening'?0:1)-(b.kind==='opening'?0:1)));
- let run=opening;
- return rows.map((r,i)=>{if(r.kind!=='opening')run+=r.signed;return {...r,running:run,openingRow:r.kind==='opening'}})
+ let run=opening;return rows.map(r=>{if(r.kind!=='opening')run+=r.signed;return {...r,running:run};});
 }
 function renderKhataLedger(){
  const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p)return;
- const b=partyBalance(p);
- document.getElementById('khataSummary').innerHTML='<div class="khata-stat"><small>They Owe Me</small><b class="green">'+money(b.oweMe)+'</b></div><div class="khata-stat"><small>I Owe Them</small><b class="red">'+money(b.iOwe)+'</b></div><div class="khata-stat"><small>Net Balance</small><b>'+money(Math.abs(b.net))+' '+(b.net>=0?'Receivable':'Payable')+'</b></div><div class="khata-stat"><small>Entries</small><b>'+ (partyTransactions.filter(x=>x.party_id===p.id).length+partyPayments.filter(x=>x.party_id===p.id).length).toLocaleString('en-IN')+'</b></div>';
+ const b=partyBalance(p),net=Math.abs(b.net);
+ document.getElementById('kbNetBalance').textContent=money(net);
+ document.getElementById('kbBalanceText').textContent=net===0?'Settled':(b.net>=0?'You will get this amount':'You will give this amount');
+ document.getElementById('kbGet').textContent=money(b.oweMe);document.getElementById('kbGive').textContent=money(b.iOwe);
  const from=document.getElementById('khataFrom').value,to=document.getElementById('khataTo').value,q=(document.getElementById('khataSearch').value||'').toLowerCase();
- const all=partyLedgerEntries(p),rows=all.filter(x=>x.kind==='opening'||((!from||x.date>=from)&&(!to||x.date<=to))&&((!q||(x.details+' '+x.note).toLowerCase().includes(q))));
- const tbody=document.getElementById('khataLedgerRows');
- tbody.innerHTML=rows.length?rows.reverse().map(x=>'<tr><td>'+ (x.kind==='opening'?'—':x.date) +'</td><td>'+escapeHTML(x.details)+(x.note?' <small style="color:#9da7b5">— '+escapeHTML(x.note)+'</small>':'')+'</td><td>'+money(x.amount)+'</td><td>'+money(x.payment)+'</td><td class="'+(x.running>=0?'green':'red')+'">'+money(Math.abs(x.running))+' '+(x.running>=0?'Receivable':'Payable')+'</td><td>'+(x.kind==='opening'?'': '<button class="history-edit secondary" onclick="editPartyEntry(\''+x.kind+'\','+x.id+')">✏️</button> <button class="history-edit secondary" onclick="deletePartyEntry(\''+x.kind+'\','+x.id+')">🗑️</button>')+'</td></tr>').join(''):'<tr><td colspan="6" class="history-empty">No ledger entries for this period.</td></tr>';
+ let rows=partyLedgerEntries(p).filter(x=>x.kind==='opening'||((!from||x.date>=from)&&(!to||x.date<=to))&&(!q||(x.details+' '+x.note).toLowerCase().includes(q)));
+ if(khataFilter==='gave')rows=rows.filter(x=>x.kind==='opening'||x.signed<0);
+ if(khataFilter==='got')rows=rows.filter(x=>x.kind==='opening'||x.signed>0);
+ if(khataFilter==='settled')rows=rows.filter(x=>x.kind==='opening'||x.running===0);
+ const box=document.getElementById('khataLedgerRows');
+ if(!rows.length){box.innerHTML='<div style="padding:40px 20px;text-align:center;color:#929ba5;font-size:12px">No transactions found.</div>';return;}
+ rows.reverse();
+ box.innerHTML=rows.map(x=>{
+   const gave=x.kind==='tx'?x.txType==='sell':x.kind==='pay'?x.direction==='paid':x.signed<0;
+   const cls=gave?'gave':'got',icon=gave?'↑':'↓',label=x.kind==='opening'?'Opening Balance':(gave?'You Gave':'You Got');
+   const amt=x.kind==='opening'?x.amount:Math.abs(x.signed||x.amount);
+   const action=x.kind==='opening'?'':'<div class="kb-txn-actions"><button onclick="editPartyEntry(\\''+x.kind+'\\','+x.id+')">✎ Edit</button><button onclick="deletePartyEntry(\\''+x.kind+'\\','+x.id+')">Delete</button></div>';
+   return '<div class="kb-txn"><div class="kb-txn-dot '+cls+'">'+icon+'</div><div class="kb-txn-main"><div class="kb-txn-title">'+escapeHTML(label)+'</div><div class="kb-txn-note">'+escapeHTML(x.details)+(x.note?' • '+escapeHTML(x.note):'')+'</div><div class="kb-txn-date">'+(x.kind==='opening'?'Balance brought forward':x.date)+'</div>'+action+'</div><div class="kb-txn-amt"><b class="'+(gave?'red':'green')+'">'+(gave?'-':'+')+money(amt)+'</b><small>Balance '+money(Math.abs(x.running))+'</small></div></div>';
+ }).join('');
 }
 function quickPartyAction(action){
  const id=activeLedgerPartyId;if(!id)return;
@@ -569,7 +588,7 @@ function showTab(id,btn){['dash','entry','history','ai'].forEach(x=>document.get
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='2.0';
+const APP_VERSION='2.1';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking…';
