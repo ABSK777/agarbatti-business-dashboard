@@ -36,6 +36,27 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 .theme-control{width:auto;min-width:128px;padding:8px 10px;border-color:#343b46;background:#11151c;font-size:12px}
 @media(max-width:520px){.chat-panel{right:10px;bottom:70px;width:calc(100vw - 20px);height:70vh}.chat-toggle{right:12px;bottom:12px}}
 
+.khata-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.khata-modal{position:fixed;inset:0;background:#000b;z-index:50;padding:20px;overflow:auto;display:flex;align-items:center;justify-content:center}
+.khata-dialog{width:min(1120px,100%);max-height:95vh;overflow:auto;background:#11151c;border:1px solid #39414d;border-radius:16px;box-shadow:0 25px 80px #000e;padding:18px}
+.khata-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid #292f39}
+.khata-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:14px 0}
+.khata-stat{background:#181d25;border:1px solid #303744;border-radius:10px;padding:12px}.khata-stat small{display:block;color:#9da7b5}.khata-stat b{display:block;font-size:19px;margin-top:5px}
+.khata-filter{display:grid;grid-template-columns:1fr 1fr 2fr;gap:9px;margin:14px 0}
+.khata-editor{background:#171b23;border:1px solid #343b46;border-radius:10px;padding:12px;margin:12px 0}
+.khata-ledger-box{max-height:50vh}.khata-ledger-box th{top:0}
+.khata-modal.hidden{display:none}
+@media(max-width:900px){.khata-stats,.khata-summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.khata-stats,.khata-summary,.khata-filter{grid-template-columns:1fr 1fr}.khata-dialog{padding:12px}.khata-modal{padding:8px}}
+@media print{
+ body.printing-khata>*{display:none!important}
+ body.printing-khata #khataModal{display:block!important;position:static!important;padding:0!important;background:#fff!important}
+ body.printing-khata #khataModal .khata-dialog{display:block!important;max-height:none!important;overflow:visible!important;box-shadow:none!important;border:0!important;color:#000!important;background:#fff!important}
+ body.printing-khata #khataModal .khata-head,body.printing-khata #khataModal .khata-summary,body.printing-khata #khataModal .khata-filter,body.printing-khata #khataModal .khata-editor{color:#000!important}
+ body.printing-khata #khataModal button{display:none!important}
+ body.printing-khata #khataModal table{min-width:0!important}
+ body.printing-khata #khataModal th,body.printing-khata #khataModal td{color:#000!important;border-color:#bbb!important;background:#fff!important}
+}
 .analysis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}.analysis-stat{background:#11151c;border:1px solid #303744;border-radius:9px;padding:10px}.analysis-stat small{color:#9da7b5}.analysis-stat b{display:block;font-size:18px;margin-top:5px}.analysis-block{border-top:1px solid #342936;padding:11px 0}.analysis-block h4{margin:0 0 7px}.good{color:#35c98b}.warn{color:#ffd166}.bad{color:#ff716f}.analysis-bar{height:7px;background:#303640;border-radius:99px;overflow:hidden}.analysis-bar span{display:block;height:100%;background:#2d9cdb}.history-edit{padding:6px 9px;font-size:11px}.history-empty{color:#9da7b5;padding:18px}
 @media(max-width:900px){.analysis-grid{grid-template-columns:repeat(2,1fr)}}
 .top-update{display:flex;align-items:center;gap:10px;justify-content:flex-end;margin:0 0 10px;color:#9da7b5;font-size:12px}.top-update button{padding:7px 10px}.top-update #updateStatus{min-width:190px;text-align:left}@media(max-width:650px){.top-update{justify-content:flex-start;flex-wrap:wrap}}
@@ -53,7 +74,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><input id="chatInput" placeholder="Type a command…" onkeydown="if(event.key==='Enter')sendChat()"><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 1.9</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 2.0</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -119,13 +140,22 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 
 <section id="people" class="hidden">
 <div class="section">📒 Khata — Customers & Suppliers</div>
+<div class="khata-stats">
+  <div class="card"><div class="label">They Owe Me</div><div class="value green" id="khataReceivable">₹0</div></div>
+  <div class="card"><div class="label">I Owe Them</div><div class="value red" id="khataPayable">₹0</div></div>
+  <div class="card"><div class="label">Customers</div><div class="value blue" id="khataCustomers">0</div></div>
+  <div class="card"><div class="label">Suppliers</div><div class="value pink" id="khataSuppliers">0</div></div>
+</div>
 <div class="card" style="margin-bottom:14px">
   <div class="formgrid">
     <div class="field"><label>🔎 Search Person</label><input id="partySearch" placeholder="Search name or phone" oninput="renderParties()"></div>
     <div class="field"><label>Account Type</label><select id="pType"><option value="customer">Customer</option><option value="supplier">Supplier</option><option value="both">Customer + Supplier</option></select></div>
     <div class="field"><label>Name / Business</label><input id="pName" placeholder="e.g. Rahul Traders"></div>
     <div class="field"><label>Phone</label><input id="pPhone" placeholder="Phone number"></div>
+    <div class="field"><label>Opening Balance (₹)</label><input id="pOpening" type="number" min="0" value="0"></div>
+    <div class="field"><label>Notes / Address</label><input id="pNotes" placeholder="Optional notes"></div>
   </div>
+  <div style="color:#9da7b5;font-size:11px;margin-top:8px">Opening balance is treated as receivable for customers and payable for suppliers.</div>
   <div class="actions"><button onclick="addParty()">➕ Add Account</button><button class="secondary" onclick="loadParties()">🔄 Refresh</button></div>
 </div>
 <div class="card" style="margin-bottom:14px">
@@ -152,9 +182,39 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="actions"><button onclick="addPartyPayment()">💵 Save Payment</button></div>
 </div>
 <div class="section">👥 My Khata Accounts</div>
-<div class="tablebox"><table style="min-width:1000px"><thead><tr><th>Person</th><th>Type</th><th>Phone</th><th>They Owe Me</th><th>I Owe Them</th><th>Open</th></tr></thead><tbody id="partyRows"></tbody></table></div>
+<div class="tablebox"><table style="min-width:1050px"><thead><tr><th>Person</th><th>Type</th><th>Phone</th><th>They Owe Me</th><th>I Owe Them</th><th>Action</th></tr></thead><tbody id="partyRows"></tbody></table></div>
 <div class="section">🧾 Recent Entries</div>
-<div class="tablebox"><table style="min-width:950px"><thead><tr><th>Date</th><th>Person</th><th>Entry</th><th>Amount</th><th>Paid/Received</th><th>Due</th><th>Note</th></tr></thead><tbody id="transactionRows"></tbody></table></div>
+<div class="tablebox"><table style="min-width:1050px"><thead><tr><th>Date</th><th>Person</th><th>Entry</th><th>Amount</th><th>Paid / Received</th><th>Due</th><th>Note</th><th>Action</th></tr></thead><tbody id="transactionRows"></tbody></table></div>
+
+<div id="khataModal" class="khata-modal hidden" onclick="if(event.target===this)closePartyLedger()">
+  <div class="khata-dialog">
+    <div class="khata-head">
+      <div><div id="khataTitle" style="font-size:20px;font-weight:800"></div><div id="khataSub" style="color:#9da7b5;font-size:12px;margin-top:3px"></div></div>
+      <button class="secondary" onclick="closePartyLedger()">✕</button>
+    </div>
+    <div class="khata-summary" id="khataSummary"></div>
+    <div class="actions" style="flex-wrap:wrap">
+      <button onclick="quickPartyAction('sale')">➕ Sale</button>
+      <button onclick="quickPartyAction('purchase')" class="secondary">📦 Purchase</button>
+      <button onclick="quickPartyAction('received')" class="secondary">💵 Receive</button>
+      <button onclick="quickPartyAction('paid')" class="secondary">💸 Pay</button>
+      <button onclick="startEditPartyAccount()" class="secondary">✏️ Edit Account</button>
+    </div>
+    <div class="khata-filter">
+      <div class="field"><label>From</label><input id="khataFrom" type="date" onchange="renderKhataLedger()"></div>
+      <div class="field"><label>To</label><input id="khataTo" type="date" onchange="renderKhataLedger()"></div>
+      <div class="field"><label>Search Note</label><input id="khataSearch" placeholder="Search details" oninput="renderKhataLedger()"></div>
+    </div>
+    <div id="khataEditor" class="khata-editor hidden"></div>
+    <div class="tablebox khata-ledger-box"><table style="min-width:850px"><thead><tr><th>Date</th><th>Details</th><th>Amount</th><th>Paid / Payment</th><th>Balance</th><th>Action</th></tr></thead><tbody id="khataLedgerRows"></tbody></table></div>
+    <div class="actions" style="justify-content:flex-end;flex-wrap:wrap;margin-top:12px">
+      <button class="secondary" onclick="exportPartyStatement()">⬇️ Export Statement</button>
+      <button class="secondary" onclick="sharePartyStatement()">📲 WhatsApp / Share</button>
+      <button class="secondary" onclick="printPartyStatement()">🖨️ Print</button>
+      <button class="secondary" onclick="deletePartyAccount()">🗑️ Delete Account</button>
+    </div>
+  </div>
+</div>
 </section>
 <section id="ai" class="hidden">
 <div class="section">🤖 AI Business Assistant</div>
@@ -289,59 +349,191 @@ function quickAI(q){
   sendChat();
 }
 function useExample(t){document.getElementById('chatInput').value=t;sendChat()}
-let parties=[];let partyTransactions=[];let partyPayments=[];
+let parties=[];let partyTransactions=[];let partyPayments=[];let activeLedgerPartyId=null;let khataEditKind=null;let khataEditId=null;
+function partyNet(p){
+ const opening=Number(p.opening_balance||0)*(p.party_type==='supplier'?-1:1);
+ const tx=partyTransactions.filter(x=>x.party_id===p.id).reduce((s,x)=>s+(x.txn_type==='sell'?1:-1)*(Number(x.due||0)),0);
+ const pay=partyPayments.filter(x=>x.party_id===p.id).reduce((s,x)=>s+(x.direction==='received'?-1:1)*Number(x.amount||0),0);
+ return opening+tx+pay;
+}
+function partyBalance(p){const net=partyNet(p);return {oweMe:Math.max(0,net),iOwe:Math.max(0,-net),net};}
 async function loadParties(){
  if(!cloudReady||!cloudUser){renderParties();return}
  const [p,t,pay]=await Promise.all([
   cloud.from('parties').select('*').eq('user_id',cloudUser.id).order('name'),
-  cloud.from('party_transactions').select('*,parties(name)').eq('user_id',cloudUser.id).order('txn_date',{ascending:false}).limit(200),
-  cloud.from('party_payments').select('*,parties(name)').eq('user_id',cloudUser.id).order('payment_date',{ascending:false}).limit(200)
+  cloud.from('party_transactions').select('*,parties(name)').eq('user_id',cloudUser.id).order('txn_date',{ascending:false}).order('created_at',{ascending:false}).limit(300),
+  cloud.from('party_payments').select('*,parties(name)').eq('user_id',cloudUser.id).order('payment_date',{ascending:false}).order('created_at',{ascending:false}).limit(300)
  ]);
  if(!p.error)parties=p.data||[]; if(!t.error)partyTransactions=t.data||[]; if(!pay.error)partyPayments=pay.data||[]; renderParties();
 }
-function partyBalance(p){
- const tx=partyTransactions.filter(x=>x.party_id===p.id);
- const pay=partyPayments.filter(x=>x.party_id===p.id);
- const oweMe=tx.filter(x=>x.txn_type==='sell').reduce((s,x)=>s+Number(x.due||0),0)-pay.filter(x=>x.direction==='received').reduce((s,x)=>s+Number(x.amount||0),0);
- const iOwe=tx.filter(x=>x.txn_type==='buy').reduce((s,x)=>s+Number(x.due||0),0)-pay.filter(x=>x.direction==='paid').reduce((s,x)=>s+Number(x.amount||0),0);
- return {oweMe:Math.max(0,oweMe),iOwe:Math.max(0,iOwe)};
-}
 function renderParties(){
- const q=(document.getElementById('partySearch')?.value||'').toLowerCase();
+ const q=(document.getElementById('partySearch')?.value||'').trim().toLowerCase();
  const visible=parties.filter(p=>(p.name+' '+(p.phone||'')).toLowerCase().includes(q));
- ['txParty','payParty'].forEach(id=>{const s=document.getElementById(id);if(s)s.innerHTML=visible.map(p=>'<option value="'+p.id+'">'+escapeHTML(p.name)+' — '+p.party_type+'</option>').join('')||'<option value="">Add an account first</option>'});
+ ['txParty','payParty'].forEach(id=>{
+   const s=document.getElementById(id);
+   if(s)s.innerHTML=parties.map(p=>'<option value="'+p.id+'">'+escapeHTML(p.name)+' — '+p.party_type+'</option>').join('')||'<option value="">Add an account first</option>';
+ });
+ const receivable=parties.reduce((s,p)=>s+partyBalance(p).oweMe,0),payable=parties.reduce((s,p)=>s+partyBalance(p).iOwe,0);
+ const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+ set('khataReceivable',money(receivable));set('khataPayable',money(payable));
+ set('khataCustomers',parties.filter(p=>p.party_type==='customer'||p.party_type==='both').length.toLocaleString('en-IN'));
+ set('khataSuppliers',parties.filter(p=>p.party_type==='supplier'||p.party_type==='both').length.toLocaleString('en-IN'));
  const rows=document.getElementById('partyRows');
- if(rows)rows.innerHTML=visible.map(p=>{const b=partyBalance(p);return '<tr><td><b>'+escapeHTML(p.name)+'</b></td><td>'+p.party_type+'</td><td>'+escapeHTML(p.phone||'')+'</td><td>'+money(b.oweMe)+'</td><td>'+money(b.iOwe)+'</td><td><button class="secondary" onclick="openPartyLedger('+p.id+')">Open Khata</button></td></tr>'}).join('')||'<tr><td colspan="6" class="history-empty">No accounts found.</td></tr>';
+ if(rows)rows.innerHTML=visible.map(p=>{const b=partyBalance(p);return '<tr><td><b>'+escapeHTML(p.name)+'</b></td><td>'+p.party_type+'</td><td>'+escapeHTML(p.phone||'')+'</td><td class="green">'+money(b.oweMe)+'</td><td class="red">'+money(b.iOwe)+'</td><td><button class="secondary" onclick="openPartyLedger('+p.id+')">📖 Open Khata</button></td></tr>'}).join('')||'<tr><td colspan="6" class="history-empty">No accounts found.</td></tr>';
+ const entries=partyTransactions.map(x=>({id:x.id,kind:'tx',date:x.txn_date,name:x.parties?.name||'',entry:x.txn_type==='sell'?'SALE':'PURCHASE',amount:Number(x.amount||0),paid:Number(x.paid||0),due:Number(x.due||0),note:x.notes||''}))
+  .concat(partyPayments.map(x=>({id:x.id,kind:'pay',date:x.payment_date,name:x.parties?.name||'',entry:x.direction==='received'?'PAYMENT RECEIVED':'PAYMENT PAID',amount:Number(x.amount||0),paid:Number(x.amount||0),due:0,note:x.notes||''})))
+  .sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,150);
  const tr=document.getElementById('transactionRows');
- const entries=partyTransactions.map(x=>({date:x.txn_date,name:x.parties?.name||'',entry:x.txn_type==='sell'?'SALE':'PURCHASE',amount:x.amount,paid:x.paid,due:x.due,note:x.notes||''})).concat(partyPayments.map(x=>({date:x.payment_date,name:x.parties?.name||'',entry:x.direction==='received'?'PAYMENT RECEIVED':'PAYMENT PAID',amount:x.amount,paid:x.amount,due:0,note:x.notes||''}))).sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,100);
- if(tr)tr.innerHTML=entries.map(x=>'<tr><td>'+x.date+'</td><td>'+escapeHTML(x.name)+'</td><td>'+x.entry+'</td><td>'+money(x.amount)+'</td><td>'+money(x.paid)+'</td><td>'+money(x.due)+'</td><td>'+escapeHTML(x.note)+'</td></tr>').join('')||'<tr><td colspan="7" class="history-empty">No entries yet.</td></tr>';
+ if(tr)tr.innerHTML=entries.map(x=>'<tr><td>'+x.date+'</td><td>'+escapeHTML(x.name)+'</td><td>'+x.entry+'</td><td>'+money(x.amount)+'</td><td>'+money(x.paid)+'</td><td>'+money(x.due)+'</td><td>'+escapeHTML(x.note)+'</td><td><button class="history-edit secondary" onclick="editPartyEntry(\''+x.kind+'\','+x.id+')">✏️</button> <button class="history-edit secondary" onclick="deletePartyEntry(\''+x.kind+'\','+x.id+')">🗑️</button></td></tr>').join('')||'<tr><td colspan="8" class="history-empty">No entries yet.</td></tr>';
+ if(activeLedgerPartyId)renderKhataLedger();
 }
 async function addParty(){
  if(!cloudReady||!cloudUser){alert('Cloud connection is required.');return}
  const name=document.getElementById('pName').value.trim();if(!name){alert('Enter a name.');return}
- const q=await cloud.from('parties').insert({user_id:cloudUser.id,name,party_type:document.getElementById('pType').value,phone:document.getElementById('pPhone').value.trim()}).select().single();
+ const opening=Math.max(0,Number(document.getElementById('pOpening').value)||0);
+ const payload={user_id:cloudUser.id,name,party_type:document.getElementById('pType').value,phone:document.getElementById('pPhone').value.trim(),opening_balance:opening,notes:document.getElementById('pNotes').value.trim()};
+ const q=await cloud.from('parties').insert(payload).select().single();
  if(q.error){alert('Could not add account: '+q.error.message);return}
- parties.push(q.data);document.getElementById('pName').value='';document.getElementById('pPhone').value='';renderParties();
+ parties.push(q.data);document.getElementById('pName').value='';document.getElementById('pPhone').value='';document.getElementById('pOpening').value='0';document.getElementById('pNotes').value='';renderParties();
 }
 async function addPartyTransaction(){
  if(!cloudReady||!cloudUser){alert('Cloud connection is required.');return}
  const partyId=+document.getElementById('txParty').value,amount=+document.getElementById('txAmount').value||0,paid=+document.getElementById('txPaid').value||0;
- if(!partyId||amount<=0||paid>amount){alert('Check account, amount and payment.');return}
- const q=await cloud.from('party_transactions').insert({user_id:cloudUser.id,party_id:partyId,txn_date:document.getElementById('txDate').value||new Date().toISOString().slice(0,10),txn_type:document.getElementById('txType').value,amount,paid,notes:document.getElementById('txNotes').value.trim()}).select('*,parties(name)').single();
+ if(!partyId||amount<=0||paid<0||paid>amount){alert('Check account, amount and payment.');return}
+ const q=await cloud.from('party_transactions').insert({user_id:cloudUser.id,party_id:partyId,txn_date:document.getElementById('txDate').value||todayISO(),txn_type:document.getElementById('txType').value,amount,paid,notes:document.getElementById('txNotes').value.trim()}).select('*,parties(name)').single();
  if(q.error){alert(q.error.message);return}partyTransactions.unshift(q.data);document.getElementById('txAmount').value='';document.getElementById('txPaid').value=0;document.getElementById('txNotes').value='';renderParties();
 }
 async function addPartyPayment(){
  if(!cloudReady||!cloudUser){alert('Cloud connection is required.');return}
  const partyId=+document.getElementById('payParty').value,amount=+document.getElementById('payAmount').value||0;
  if(!partyId||amount<=0){alert('Select an account and enter an amount.');return}
- const q=await cloud.from('party_payments').insert({user_id:cloudUser.id,party_id:partyId,payment_date:document.getElementById('payDate').value||new Date().toISOString().slice(0,10),direction:document.getElementById('payDirection').value,amount,notes:document.getElementById('payNotes').value.trim()}).select('*,parties(name)').single();
+ const q=await cloud.from('party_payments').insert({user_id:cloudUser.id,party_id:partyId,payment_date:document.getElementById('payDate').value||todayISO(),direction:document.getElementById('payDirection').value,amount,notes:document.getElementById('payNotes').value.trim()}).select('*,parties(name)').single();
  if(q.error){alert(q.error.message);return}partyPayments.unshift(q.data);document.getElementById('payAmount').value='';document.getElementById('payNotes').value='';renderParties();
 }
+function todayISO(){return new Date().toISOString().slice(0,10)}
+function closePartyLedger(){const m=document.getElementById('khataModal');if(m)m.classList.add('hidden');activeLedgerPartyId=null;khataEditKind=null;khataEditId=null;}
 function openPartyLedger(id){
  const p=parties.find(x=>x.id===id);if(!p)return;
- const b=partyBalance(p);const tx=partyTransactions.filter(x=>x.party_id===id).sort((a,z)=>String(z.txn_date).localeCompare(String(a.txn_date)));const pay=partyPayments.filter(x=>x.party_id===id);
- const lines=tx.map(x=>x.txn_date+' | '+(x.txn_type==='sell'?'SALE':'PURCHASE')+' | ₹'+Number(x.amount).toLocaleString('en-IN')+' | Due ₹'+Number(x.due).toLocaleString('en-IN')).concat(pay.map(x=>x.payment_date+' | '+(x.direction==='received'?'RECEIVED':'PAID')+' | ₹'+Number(x.amount).toLocaleString('en-IN'))).sort().reverse().join('\n');
- alert(p.name+'\n\nThey owe me: ₹'+b.oweMe.toLocaleString('en-IN')+'\nI owe them: ₹'+b.iOwe.toLocaleString('en-IN')+'\n\n'+(lines||'No entries yet.'));
+ activeLedgerPartyId=id;khataEditKind=null;khataEditId=null;
+ const m=document.getElementById('khataModal');m.classList.remove('hidden');
+ document.getElementById('khataTitle').textContent='📖 '+p.name;
+ document.getElementById('khataSub').textContent=(p.phone?p.phone+' • ':'')+p.party_type.toUpperCase();
+ const all=partyLedgerEntries(p);
+ const first=all.filter(x=>x.kind!=='opening').map(x=>x.date).sort()[0],last=all.filter(x=>x.kind!=='opening').map(x=>x.date).sort().slice(-1)[0];
+ document.getElementById('khataFrom').value=first||'';document.getElementById('khataTo').value=last||'';document.getElementById('khataSearch').value='';
+ renderKhataLedger();
+}
+function partyLedgerEntries(p){
+ const rows=[];
+ const opening=Number(p.opening_balance||0)*(p.party_type==='supplier'?-1:1);
+ if(opening)rows.push({kind:'opening',id:0,date:'0000-00-00',details:'Opening Balance',amount:Math.abs(opening),payment:0,signed:opening,note:'Opening balance'});
+ partyTransactions.filter(x=>x.party_id===p.id).forEach(x=>{
+   const due=Number(x.due||0),signed=(x.txn_type==='sell'?1:-1)*due;
+   rows.push({kind:'tx',id:x.id,date:x.txn_date,details:x.txn_type==='sell'?'🧾 Credit Sale':'📦 Credit Purchase',amount:Number(x.amount||0),payment:Number(x.paid||0),signed,note:x.notes||''});
+ });
+ partyPayments.filter(x=>x.party_id===p.id).forEach(x=>{
+   const signed=x.direction==='received'?-Number(x.amount||0):Number(x.amount||0);
+   rows.push({kind:'pay',id:x.id,date:x.payment_date,details:x.direction==='received'?'💵 Money Received':'💸 Money Paid',amount:Number(x.amount||0),payment:Number(x.amount||0),signed,note:x.notes||''});
+ });
+ rows.sort((a,b)=>String(a.date).localeCompare(String(b.date))||((a.kind==='opening'?0:1)-(b.kind==='opening'?0:1)));
+ let run=opening;
+ return rows.map((r,i)=>{if(r.kind!=='opening')run+=r.signed;return {...r,running:run,openingRow:r.kind==='opening'}})
+}
+function renderKhataLedger(){
+ const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p)return;
+ const b=partyBalance(p);
+ document.getElementById('khataSummary').innerHTML='<div class="khata-stat"><small>They Owe Me</small><b class="green">'+money(b.oweMe)+'</b></div><div class="khata-stat"><small>I Owe Them</small><b class="red">'+money(b.iOwe)+'</b></div><div class="khata-stat"><small>Net Balance</small><b>'+money(Math.abs(b.net))+' '+(b.net>=0?'Receivable':'Payable')+'</b></div><div class="khata-stat"><small>Entries</small><b>'+ (partyTransactions.filter(x=>x.party_id===p.id).length+partyPayments.filter(x=>x.party_id===p.id).length).toLocaleString('en-IN')+'</b></div>';
+ const from=document.getElementById('khataFrom').value,to=document.getElementById('khataTo').value,q=(document.getElementById('khataSearch').value||'').toLowerCase();
+ const all=partyLedgerEntries(p),rows=all.filter(x=>x.kind==='opening'||((!from||x.date>=from)&&(!to||x.date<=to))&&((!q||(x.details+' '+x.note).toLowerCase().includes(q))));
+ const tbody=document.getElementById('khataLedgerRows');
+ tbody.innerHTML=rows.length?rows.reverse().map(x=>'<tr><td>'+ (x.kind==='opening'?'—':x.date) +'</td><td>'+escapeHTML(x.details)+(x.note?' <small style="color:#9da7b5">— '+escapeHTML(x.note)+'</small>':'')+'</td><td>'+money(x.amount)+'</td><td>'+money(x.payment)+'</td><td class="'+(x.running>=0?'green':'red')+'">'+money(Math.abs(x.running))+' '+(x.running>=0?'Receivable':'Payable')+'</td><td>'+(x.kind==='opening'?'': '<button class="history-edit secondary" onclick="editPartyEntry(\''+x.kind+'\','+x.id+')">✏️</button> <button class="history-edit secondary" onclick="deletePartyEntry(\''+x.kind+'\','+x.id+')">🗑️</button>')+'</td></tr>').join(''):'<tr><td colspan="6" class="history-empty">No ledger entries for this period.</td></tr>';
+}
+function quickPartyAction(action){
+ const id=activeLedgerPartyId;if(!id)return;
+ closePartyLedger();showTab('people',document.querySelector('.tab:nth-child(4)'));
+ if(action==='sale'||action==='purchase'){document.getElementById('txParty').value=id;document.getElementById('txType').value=action==='sale'?'sell':'buy';document.getElementById('txDate').value=todayISO();document.getElementById('txAmount').focus();document.getElementById('txAmount').scrollIntoView({behavior:'smooth',block:'center'});}
+ else {document.getElementById('payParty').value=id;document.getElementById('payDirection').value=action;document.getElementById('payDate').value=todayISO();document.getElementById('payAmount').focus();document.getElementById('payAmount').scrollIntoView({behavior:'smooth',block:'center'});}
+}
+function startEditPartyAccount(){
+ const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p)return;
+ khataEditKind='account';khataEditId=p.id;
+ document.getElementById('khataEditor').classList.remove('hidden');
+ document.getElementById('khataEditor').innerHTML='<div class="section" style="margin-top:0">✏️ Edit Account</div><div class="formgrid"><div class="field"><label>Name</label><input id="keName" value="'+escapeHTML(p.name)+'"></div><div class="field"><label>Type</label><select id="keType"><option value="customer">Customer</option><option value="supplier">Supplier</option><option value="both">Customer + Supplier</option></select></div><div class="field"><label>Phone</label><input id="kePhone" value="'+escapeHTML(p.phone||'')+'"></div><div class="field"><label>Opening Balance (₹)</label><input id="keOpening" type="number" min="0" value="'+Number(p.opening_balance||0)+'"></div><div class="field"><label>Notes</label><input id="keNotes" value="'+escapeHTML(p.notes||'')+'"></div></div><div class="actions"><button onclick="saveKhataEdit()">💾 Save Account</button><button class="secondary" onclick="closeKhataEditor()">Cancel</button></div>';
+ document.getElementById('keType').value=p.party_type;
+}
+function closeKhataEditor(){const e=document.getElementById('khataEditor');if(e)e.classList.add('hidden');khataEditKind=null;khataEditId=null;}
+function editPartyEntry(kind,id){
+ const p=parties.find(x=>x.id===activeLedgerPartyId)||null;
+ if(p){const m=document.getElementById('khataModal');if(m.classList.contains('hidden'))openPartyLedger(p.id);}
+ khataEditKind=kind;khataEditId=id;
+ const e=document.getElementById('khataEditor');e.classList.remove('hidden');
+ if(kind==='tx'){
+   const x=partyTransactions.find(v=>v.id===id);if(!x)return;
+   e.innerHTML='<div class="section" style="margin-top:0">✏️ Edit '+(x.txn_type==='sell'?'Sale':'Purchase')+'</div><div class="formgrid"><div class="field"><label>Type</label><select id="keTxType"><option value="sell">Credit Sale</option><option value="buy">Credit Purchase</option></select></div><div class="field"><label>Date</label><input id="keDate" type="date" value="'+x.txn_date+'"></div><div class="field"><label>Amount (₹)</label><input id="keAmount" type="number" min="0" value="'+Number(x.amount||0)+'"></div><div class="field"><label>Paid / Received (₹)</label><input id="kePaid" type="number" min="0" value="'+Number(x.paid||0)+'"></div><div class="field"><label>Note</label><input id="keNotes" value="'+escapeHTML(x.notes||'')+'"></div></div><div class="actions"><button onclick="saveKhataEdit()">💾 Save Entry</button><button class="secondary" onclick="closeKhataEditor()">Cancel</button></div>';
+   document.getElementById('keTxType').value=x.txn_type;
+ }else{
+   const x=partyPayments.find(v=>v.id===id);if(!x)return;
+   e.innerHTML='<div class="section" style="margin-top:0">✏️ Edit Payment</div><div class="formgrid"><div class="field"><label>Payment Type</label><select id="keDirection"><option value="received">Money Received</option><option value="paid">Money Paid</option></select></div><div class="field"><label>Date</label><input id="keDate" type="date" value="'+x.payment_date+'"></div><div class="field"><label>Amount (₹)</label><input id="keAmount" type="number" min="0" value="'+Number(x.amount||0)+'"></div><div class="field"><label>Note</label><input id="keNotes" value="'+escapeHTML(x.notes||'')+'"></div></div><div class="actions"><button onclick="saveKhataEdit()">💾 Save Payment</button><button class="secondary" onclick="closeKhataEditor()">Cancel</button></div>';
+   document.getElementById('keDirection').value=x.direction;
+ }
+}
+async function saveKhataEdit(){
+ if(!cloudReady||!cloudUser||!khataEditKind)return;
+ let q;
+ if(khataEditKind==='account'){
+   const name=document.getElementById('keName').value.trim();if(!name){alert('Enter a name.');return}
+   q=await cloud.from('parties').update({name,party_type:document.getElementById('keType').value,phone:document.getElementById('kePhone').value.trim(),opening_balance:Math.max(0,Number(document.getElementById('keOpening').value)||0),notes:document.getElementById('keNotes').value.trim(),updated_at:new Date().toISOString()}).eq('id',khataEditId).eq('user_id',cloudUser.id).select().single();
+   if(q.error){alert(q.error.message);return}
+   parties=parties.map(p=>p.id===khataEditId?q.data:p);closeKhataEditor();openPartyLedger(khataEditId);renderParties();return;
+ }
+ if(khataEditKind==='tx'){
+   const amount=Math.max(0,Number(document.getElementById('keAmount').value)||0),paid=Math.max(0,Number(document.getElementById('kePaid').value)||0);if(amount<=0||paid>amount){alert('Check amount and payment.');return}
+   q=await cloud.from('party_transactions').update({txn_type:document.getElementById('keTxType').value,txn_date:document.getElementById('keDate').value||todayISO(),amount,paid,notes:document.getElementById('keNotes').value.trim()}).eq('id',khataEditId).eq('user_id',cloudUser.id).select('*,parties(name)').single();
+   if(q.error){alert(q.error.message);return}
+   partyTransactions=partyTransactions.map(x=>x.id===khataEditId?q.data:x);
+ }else{
+   const amount=Math.max(0,Number(document.getElementById('keAmount').value)||0);if(amount<=0){alert('Enter a valid amount.');return}
+   q=await cloud.from('party_payments').update({direction:document.getElementById('keDirection').value,payment_date:document.getElementById('keDate').value||todayISO(),amount,notes:document.getElementById('keNotes').value.trim()}).eq('id',khataEditId).eq('user_id',cloudUser.id).select('*,parties(name)').single();
+   if(q.error){alert(q.error.message);return}
+   partyPayments=partyPayments.map(x=>x.id===khataEditId?q.data:x);
+ }
+ closeKhataEditor();renderParties();
+}
+async function deletePartyEntry(kind,id){
+ if(!cloudReady||!cloudUser)return;
+ if(!confirm('Delete this entry? This cannot be undone.'))return;
+ const table=kind==='tx'?'party_transactions':'party_payments';
+ const q=await cloud.from(table).delete().eq('id',id).eq('user_id',cloudUser.id).select().single();
+ if(q.error){alert(q.error.message);return}
+ if(kind==='tx')partyTransactions=partyTransactions.filter(x=>x.id!==id);else partyPayments=partyPayments.filter(x=>x.id!==id);
+ renderParties();
+}
+async function deletePartyAccount(){
+ const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p||!cloudReady||!cloudUser)return;
+ if(!confirm('Delete '+p.name+' and all its khata entries? This cannot be undone.'))return;
+ const q=await cloud.from('parties').delete().eq('id',p.id).eq('user_id',cloudUser.id).select().single();
+ if(q.error){alert(q.error.message);return}
+ parties=parties.filter(x=>x.id!==p.id);partyTransactions=partyTransactions.filter(x=>x.party_id!==p.id);partyPayments=partyPayments.filter(x=>x.party_id!==p.id);closePartyLedger();renderParties();
+}
+function statementLines(p){
+ const b=partyBalance(p),rows=partyLedgerEntries(p).filter(x=>x.kind!=='opening'||Number(p.opening_balance||0));
+ const lines=['AGARBATTI BUSINESS — KHATA STATEMENT','Account: '+p.name,'Type: '+p.party_type+(p.phone?' | Phone: '+p.phone:''),'They Owe Me: '+money(b.oweMe),'I Owe Them: '+money(b.iOwe),'Net: '+money(Math.abs(b.net))+' '+(b.net>=0?'Receivable':'Payable'),'','DATE | DETAILS | AMOUNT | PAID/PAYMENT | BALANCE'];
+ rows.forEach(x=>lines.push((x.kind==='opening'?'Opening':x.date)+' | '+x.details.replace(/^[^ ]+ /,'')+' | '+money(x.amount)+' | '+money(x.payment)+' | '+money(Math.abs(x.running))+' '+(x.running>=0?'Receivable':'Payable')));
+ return lines.join('\n');
+}
+function exportPartyStatement(){
+ const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p)return;
+ const rows=partyLedgerEntries(p).filter(x=>x.kind!=='opening'||Number(p.opening_balance||0)).map(x=>[x.kind==='opening'?'Opening':x.date,x.details, x.amount, x.payment, x.running>=0?'Receivable':'Payable',Math.abs(x.running),x.note]);
+ const csv=[['Date','Details','Amount','Paid / Payment','Balance Type','Balance','Note'],...rows].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');
+ const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='khata-'+p.name.replace(/[^a-z0-9]+/gi,'-')+'.csv';a.click();URL.revokeObjectURL(url);
+}
+function sharePartyStatement(){
+ const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p)return;
+ const text=statementLines(p);window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank','noopener');
+}
+function printPartyStatement(){
+ const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p)return;
+ document.body.classList.add('printing-khata');window.print();setTimeout(()=>document.body.classList.remove('printing-khata'),500);
 }
 function todayEntry(){let t=new Date().toISOString().slice(0,10);return data.find(x=>x.date===t)||null}
 function commandResponse(raw){let q=raw.toLowerCase().trim();let t=new Date().toISOString().slice(0,10);let e=todayEntry();
@@ -377,7 +569,7 @@ function showTab(id,btn){['dash','entry','history','ai'].forEach(x=>document.get
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='1.9';
+const APP_VERSION='2.0';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking…';
