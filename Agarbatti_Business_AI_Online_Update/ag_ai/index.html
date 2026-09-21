@@ -50,10 +50,9 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="auth-card">
     <button class="secondary auth-close" onclick="closeAuth()">✕</button>
     <h2>☁️ Cloud Dashboard Login</h2>
-    <p>Sign in to securely sync your Agarbatti business data across devices.</p>
+    <p>Sign in without a password. Enter your email and we will send you a secure one-time login link.</p>
     <input id="authEmail" type="email" placeholder="Email address" autocomplete="email">
-    <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password">
-    <div class="actions"><button onclick="signIn()">Sign In</button><button class="secondary" onclick="signUp()">Create Account</button><button class="secondary" onclick="resendConfirmation()">Resend Email</button></div>
+    <div class="actions"><button onclick="signIn()">📩 Send Login Link</button></div>
     <div id="authMessage" class="auth-message"></div>
   </div>
 </div>
@@ -65,7 +64,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><input id="chatInput" placeholder="Type a command…" onkeydown="if(event.key==='Enter')sendChat()"><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 1.3</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 1.4</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -191,29 +190,12 @@ function closeAuth(){document.getElementById('authPanel').classList.add('hidden'
 function authMsg(msg,ok=false){const el=document.getElementById('authMessage');if(el){el.textContent=msg;el.style.color=ok?'#35c98b':'#ffd166';}}
 async function signIn(){
   if(!cloudReady){authMsg('Supabase is not configured.');return}
-  const email=document.getElementById('authEmail').value.trim(), password=document.getElementById('authPassword').value;
-  if(!email||!password){authMsg('Enter your email and password.');return}
-  const {error}=await cloud.auth.signInWithPassword({email,password});
-  if(error){authMsg(error.message);return}
-  closeAuth();
-}
-async function signUp(){
-  if(!cloudReady){authMsg('Supabase is not configured.');return}
-  const email=document.getElementById('authEmail').value.trim(), password=document.getElementById('authPassword').value;
-  if(!email||password.length<6){authMsg('Enter an email and a password of at least 6 characters.');return}
-  const redirectTo=window.location.origin+window.location.pathname;
-  const {data:res,error}=await cloud.auth.signUp({email,password,options:{emailRedirectTo:redirectTo}});
-  if(error){authMsg(error.message);return}
-  if(res.session){closeAuth();}else authMsg('Account created. Check your email (and Spam/Junk). Then click the confirmation link and come back to Sign In.',true);
-}
-async function resendConfirmation(){
-  if(!cloudReady){authMsg('Supabase is not configured.');return}
   const email=document.getElementById('authEmail').value.trim();
-  if(!email){authMsg('Enter your email address first.');return}
+  if(!email){authMsg('Enter your email address.');return}
   const redirectTo=window.location.origin+window.location.pathname;
-  const {error}=await cloud.auth.resend({type:'signup',email,options:{emailRedirectTo:redirectTo}});
+  const {error}=await cloud.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo,shouldCreateUser:true}});
   if(error){authMsg(error.message);return}
-  authMsg('Confirmation email sent. Check Inbox and Spam/Junk.',true);
+  authMsg('Login link sent. Check your email and click the secure link to sign in.',true);
 }
 async function signOut(){
   if(cloud)await cloud.auth.signOut();
@@ -294,7 +276,7 @@ function showTab(id,btn){['dash','entry','history','ai'].forEach(x=>document.get
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='1.3';
+const APP_VERSION='1.4';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking…';
