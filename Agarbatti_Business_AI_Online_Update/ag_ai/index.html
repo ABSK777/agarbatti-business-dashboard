@@ -33,10 +33,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 .chat-body{flex:1;overflow:auto;padding:14px}.msg{margin:8px 0;display:flex}.msg.user{justify-content:flex-end}.bubble{max-width:88%;padding:10px 12px;border-radius:12px;line-height:1.4;font-size:13px;white-space:pre-wrap}.msg.ai .bubble{background:#202631}.msg.user .bubble{background:var(--pink)}
 .chat-input{padding:10px;border-top:1px solid #292f39;display:flex;gap:7px}.chat-input input{flex:1}.chat-input button{padding:9px 11px}.chat-examples{padding:0 14px 10px;color:var(--muted);font-size:11px}.chat-examples span{display:inline-block;border:1px solid #343b46;border-radius:12px;padding:5px 8px;margin:3px;cursor:pointer}
 .chat-panel.hidden,.chat-toggle.hidden{display:none}
-.auth-panel{position:fixed;inset:0;background:#000b;z-index:50;display:grid;place-items:center;padding:18px}
-.auth-card{width:min(420px,100%);background:#171b23;border:1px solid #343b46;border-radius:16px;padding:24px;box-shadow:0 20px 60px #000b;position:relative}
-.auth-card h2{margin:0 0 8px}.auth-card p{color:#9da7b5;font-size:13px;line-height:1.5}.auth-card input{margin:6px 0}.auth-close{position:absolute;right:14px;top:14px;padding:7px 10px}.auth-message{margin-top:10px;color:#ffd166;font-size:12px;line-height:1.5}
-.auth-user{color:#9da7b5;font-size:11px}.theme-control{width:auto;min-width:128px;padding:8px 10px;border-color:#343b46;background:#11151c;font-size:12px}
+.theme-control{width:auto;min-width:128px;padding:8px 10px;border-color:#343b46;background:#11151c;font-size:12px}
 @media(max-width:520px){.chat-panel{right:10px;bottom:70px;width:calc(100vw - 20px);height:70vh}.chat-toggle{right:12px;bottom:12px}}
 
 .analysis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}.analysis-stat{background:#11151c;border:1px solid #303744;border-radius:9px;padding:10px}.analysis-stat small{color:#9da7b5}.analysis-stat b{display:block;font-size:18px;margin-top:5px}.analysis-block{border-top:1px solid #342936;padding:11px 0}.analysis-block h4{margin:0 0 7px}.good{color:#35c98b}.warn{color:#ffd166}.bad{color:#ff716f}.analysis-bar{height:7px;background:#303640;border-radius:99px;overflow:hidden}.analysis-bar span{display:block;height:100%;background:#2d9cdb}.history-edit{padding:6px 9px;font-size:11px}.history-empty{color:#9da7b5;padding:18px}
@@ -45,16 +42,8 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 </style>
 </head>
 <body>
-<header><h1>🪔 AGARBATTI BUSINESS — AI DASHBOARD</h1><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="status" id="status">● Cloud sign-in required</span><label style="font-size:11px;color:#9da7b5">🎨 Color <select id="themeColor" class="theme-control" onchange="applyThemeColor(this.value)" aria-label="Dashboard color"><option value="#d51b78">Pink</option><option value="#2d9cdb">Blue</option><option value="#35c98b">Green</option><option value="#f59e0b">Orange</option><option value="#8b5cf6">Purple</option><option value="#ef4444">Red</option></select></label><button id="authBtn" class="secondary" onclick="openAuth()">Sign in</button></div></header>
-<div id="authPanel" class="auth-panel hidden">
-  <div class="auth-card">
-    <button class="secondary auth-close" onclick="closeAuth()">✕</button>
-    <h2>☁️ Cloud Dashboard Login</h2>
-    <p>Sign in without a password. Enter your email and we will send you a secure one-time login link.</p>
-    <input id="authEmail" type="email" placeholder="Email address" autocomplete="email">
-    <div class="actions"><button onclick="signIn()">📩 Send Login Link</button></div>
-    <div id="authMessage" class="auth-message"></div>
-  </div>
+<header><h1>🪔 AGARBATTI BUSINESS — AI DASHBOARD</h1><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="status" id="status">● Starting cloud sync…</span><label style="font-size:11px;color:#9da7b5">🎨 Color <select id="themeColor" class="theme-control" onchange="applyThemeColor(this.value)" aria-label="Dashboard color"><option value="#d51b78">Pink</option><option value="#2d9cdb">Blue</option><option value="#35c98b">Green</option><option value="#f59e0b">Orange</option><option value="#8b5cf6">Purple</option><option value="#ef4444">Red</option></select></label></div></header>
+
 </div>
 <button id="chatToggle" class="chat-toggle" onclick="toggleChat()">🤖 Ask AI</button>
 <div id="chatPanel" class="chat-panel hidden">
@@ -64,7 +53,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><input id="chatInput" placeholder="Type a command…" onkeydown="if(event.key==='Enter')sendChat()"><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 1.4</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 1.5</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -185,37 +174,34 @@ async function saveCloud(e){
   document.getElementById('status').textContent='● Cloud backup saved';
   return true;
 }
-function openAuth(){document.getElementById('authPanel').classList.remove('hidden');}
-function closeAuth(){document.getElementById('authPanel').classList.add('hidden');}
-function authMsg(msg,ok=false){const el=document.getElementById('authMessage');if(el){el.textContent=msg;el.style.color=ok?'#35c98b':'#ffd166';}}
-async function signIn(){
-  if(!cloudReady){authMsg('Supabase is not configured.');return}
-  const email=document.getElementById('authEmail').value.trim();
-  if(!email){authMsg('Enter your email address.');return}
-  const redirectTo=window.location.origin+window.location.pathname;
-  const {error}=await cloud.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo,shouldCreateUser:true}});
-  if(error){authMsg(error.message);return}
-  authMsg('Login link sent. Check your email and click the secure link to sign in.',true);
-}
-async function signOut(){
-  if(cloud)await cloud.auth.signOut();
-}
 async function initCloudAuth(){
-  if(!cloudReady){document.getElementById('status').textContent='● Local data ready';return}
+  if(!cloudReady){
+    document.getElementById('status').textContent='● Local mode';
+    authInitialized=true;
+    return;
+  }
   const {data:{session}}=await cloud.auth.getSession();
-  await handleAuthSession(session);
-  cloud.auth.onAuthStateChange((_event,nextSession)=>{setTimeout(()=>handleAuthSession(nextSession),0)});
+  if(session){
+    await handleAuthSession(session);
+    return;
+  }
+  const {data,error}=await cloud.auth.signInAnonymously();
+  if(error){
+    console.warn('Anonymous cloud session unavailable:',error);
+    document.getElementById('status').textContent='● Local mode — cloud sign-in disabled';
+    authInitialized=true;
+    return;
+  }
+  await handleAuthSession(data.session);
 }
 async function handleAuthSession(session){
   cloudUser=session?.user||null;
-  const btn=document.getElementById('authBtn');
   if(!cloudUser){
-    document.getElementById('status').textContent='● Sign in for cloud sync';
-    btn.textContent='Sign in';btn.onclick=openAuth;
-    authInitialized=true;return;
+    document.getElementById('status').textContent='● Local mode';
+    authInitialized=true;
+    return;
   }
-  btn.textContent='Sign out';btn.onclick=signOut;
-  document.getElementById('status').textContent='● Cloud connected';
+  document.getElementById('status').textContent='● Cloud connected (no login required)';
   authInitialized=true;
   await loadCloud();
 }
@@ -276,7 +262,7 @@ function showTab(id,btn){['dash','entry','history','ai'].forEach(x=>document.get
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='1.4';
+const APP_VERSION='1.5';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking…';
