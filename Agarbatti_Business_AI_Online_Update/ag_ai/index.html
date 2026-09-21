@@ -53,7 +53,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><input id="chatInput" placeholder="Type a command…" onkeydown="if(event.key==='Enter')sendChat()"><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 1.5</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 1.6</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -188,7 +188,7 @@ async function initCloudAuth(){
   const {data,error}=await cloud.auth.signInAnonymously();
   if(error){
     console.warn('Anonymous cloud session unavailable:',error);
-    document.getElementById('status').textContent='● Local mode — cloud sign-in disabled';
+    document.getElementById('status').textContent='● Local mode — cloud unavailable';
     authInitialized=true;
     return;
   }
@@ -201,7 +201,7 @@ async function handleAuthSession(session){
     authInitialized=true;
     return;
   }
-  document.getElementById('status').textContent='● Cloud connected (no login required)';
+  document.getElementById('status').textContent='● Cloud connected';
   authInitialized=true;
   await loadCloud();
 }
@@ -245,9 +245,9 @@ async function sendChat(){let input=document.getElementById('chatInput');let q=i
 function escapeHTML(s){return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]))}
 async function askRealAI(message){
   if(!cloudReady)throw new Error('Connect Supabase first.');
-  if(!cloudUser)throw new Error('Please sign in to use the cloud AI assistant.');
+  if(!cloudUser)throw new Error('Cloud AI is unavailable in this mode.');
   const {data:{session}}=await cloud.auth.getSession();
-  if(!session?.access_token)throw new Error('Your session has expired. Please sign in again.');
+  if(!session?.access_token)throw new Error('Your cloud session is unavailable. Please refresh the dashboard.');
   let base=window.SUPABASE_URL.replace(/\/$/,'');let fn=window.AI_FUNCTION_NAME||'ai-chat';let url=base+'/functions/v1/'+fn;
   let headers={'Content-Type':'application/json','apikey':window.SUPABASE_ANON_KEY,'Authorization':'Bearer '+session.access_token};
   let r=await fetch(url,{method:'POST',headers,body:JSON.stringify({message})});let body=await r.json();if(!r.ok||body.error)throw new Error(body.error||'AI request failed');return body.reply||'No AI response.'}
@@ -262,7 +262,7 @@ function showTab(id,btn){['dash','entry','history','ai'].forEach(x=>document.get
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='1.5';
+const APP_VERSION='1.6';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking…';
