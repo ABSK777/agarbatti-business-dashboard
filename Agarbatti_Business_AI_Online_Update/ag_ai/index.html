@@ -53,7 +53,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><input id="chatInput" placeholder="Type a command…" onkeydown="if(event.key==='Enter')sendChat()"><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 1.6</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 1.7</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -63,7 +63,19 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 <div class="card"><div class="label">Orders</div><div class="value pink" id="orders">0</div></div>
 <div class="card"><div class="label">Closing Stock</div><div class="value blue" id="stock">0</div></div>
 </div>
-<div class="charts"><div class="chartbox"><canvas id="salesChart"></canvas></div><div class="chartbox"><canvas id="stockChart"></canvas></div></div>
+<div class="charts"><div class="chartbox"><canvas id="salesChart"></canvas></div><div class="chartbox"><canvas id="stockChart"></canvas></div></div><div class="card ai" style="margin-top:14px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+    <div><b>🤖 AI Business Assistant</b><div style="color:#9da7b5;font-size:12px;margin-top:4px">Ask your business questions and get instant insights from your dashboard.</div></div>
+    <button onclick="toggleChat()">💬 Ask AI</button>
+  </div>
+  <div class="actions" style="flex-wrap:wrap;margin-top:10px">
+    <button class="secondary" onclick="quickAI('show today sales')">💰 Today Sales</button>
+    <button class="secondary" onclick="quickAI('show profit')">📈 Profit</button>
+    <button class="secondary" onclick="quickAI('show stock')">📦 Stock</button>
+    <button class="secondary" onclick="quickAI('analyze business')">🔎 Analyze</button>
+  </div>
+  <div id="aiQuickResult" class="insight" style="margin-top:8px">AI is ready. Choose a quick action or open Ask AI.</div>
+</div>
 <div class="section">Recent Daily Data</div><div class="tablebox"><table><thead><tr><th>Date</th><th>Sales</th><th>Orders</th><th>Units</th><th>Production</th><th>Expenses</th><th>Profit</th><th>Stock</th><th>Top Product</th></tr></thead><tbody id="rows"></tbody></table></div>
 </section>
 
@@ -227,6 +239,15 @@ msgs.push(`🛒 <b>Next action:</b> compare top product (${last.product}) sales 
 el.innerHTML=msgs.map(x=>`<div class="insight">${x}</div>`).join('')}
 function toggleChat(){document.getElementById('chatPanel').classList.toggle('hidden');document.getElementById('chatToggle').classList.toggle('hidden');if(!document.getElementById('chatBody').children.length){addChat('ai','Hi! I can read your dashboard and understand natural-language business questions. Try “How was my business this week?”, “Why did profit fall?”, “show today sales”, or “আজকের বিক্রি কত?”')}}
 function addChat(who,text){let b=document.getElementById('chatBody');let m=document.createElement('div');m.className='msg '+who;let bubble=document.createElement('div');bubble.className='bubble';bubble.innerHTML=String(text).replace(/\n/g,'<br>');m.appendChild(bubble);b.appendChild(m);b.scrollTop=b.scrollHeight}
+function quickAI(q){
+  const el=document.getElementById('aiQuickResult');
+  const answer=commandResponse(q);
+  if(answer!==null){if(el)el.textContent=answer;toggleChat();document.getElementById('chatInput').value=q;sendChat();return}
+  if(el)el.textContent='Thinking…';
+  toggleChat();
+  document.getElementById('chatInput').value=q;
+  sendChat();
+}
 function useExample(t){document.getElementById('chatInput').value=t;sendChat()}
 function todayEntry(){let t=new Date().toISOString().slice(0,10);return data.find(x=>x.date===t)||null}
 function commandResponse(raw){let q=raw.toLowerCase().trim();let t=new Date().toISOString().slice(0,10);let e=todayEntry();
@@ -262,7 +283,7 @@ function showTab(id,btn){['dash','entry','history','ai'].forEach(x=>document.get
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='1.6';
+const APP_VERSION='1.7';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking…';
