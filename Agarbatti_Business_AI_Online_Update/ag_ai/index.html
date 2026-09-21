@@ -463,7 +463,7 @@ function renderKhataLedger(){
    const gave=x.kind==='tx'?x.txType==='sell':x.kind==='pay'?x.direction==='paid':x.signed<0;
    const cls=gave?'gave':'got',icon=gave?'↑':'↓',label=x.kind==='opening'?'Opening Balance':(gave?'You Gave':'You Got');
    const amt=x.kind==='opening'?x.amount:Math.abs(x.signed||x.amount);
-   const action=x.kind==='opening'?'':'<div class="kb-txn-actions"><button onclick="editPartyEntry(\\''+x.kind+'\\','+x.id+')">✎ Edit</button><button onclick="deletePartyEntry(\\''+x.kind+'\\','+x.id+')">Delete</button></div>';
+   const action=x.kind==='opening'?'':'<div class="kb-txn-actions"><button onclick="editPartyEntry(\''+x.kind+'\','+x.id+')">✎ Edit</button><button onclick="deletePartyEntry(\''+x.kind+'\','+x.id+')">Delete</button></div>';
    return '<div class="kb-txn"><div class="kb-txn-dot '+cls+'">'+icon+'</div><div class="kb-txn-main"><div class="kb-txn-title">'+escapeHTML(label)+'</div><div class="kb-txn-note">'+escapeHTML(x.details)+(x.note?' • '+escapeHTML(x.note):'')+'</div><div class="kb-txn-date">'+(x.kind==='opening'?'Balance brought forward':x.date)+'</div>'+action+'</div><div class="kb-txn-amt"><b class="'+(gave?'red':'green')+'">'+(gave?'-':'+')+money(amt)+'</b><small>Balance '+money(Math.abs(x.running))+'</small></div></div>';
  }).join('');
 }
