@@ -49,6 +49,8 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 .khata-phone .khata-editor{background:#f7f8fa;border:0;border-top:1px solid #e5e8ec;border-bottom:1px solid #e5e8ec;border-radius:0;margin:0;padding:12px;color:#20252b}.khata-phone .khata-editor input,.khata-phone .khata-editor select{background:#fff;color:#20252b;border-color:#d7dce2}.khata-modal.hidden{display:none}
 @media(max-width:520px){.khata-modal{padding:0}.khata-phone{width:100%;height:100vh;max-height:none;border-radius:0;border:0}.kb-topbar{height:62px}.kb-balance-card{padding-top:18px}.kb-balance-value{font-size:30px}}
 @media(min-width:521px){.khata-phone{border-radius:22px}}
+.people-hero{display:flex;justify-content:space-between;align-items:center;gap:12px;background:linear-gradient(135deg,#171b23,#202733);border:1px solid #303744;border-radius:14px;padding:18px;margin-bottom:12px}.people-hero b{font-size:20px}.people-muted{color:#9da7b5;font-size:11px;margin-top:4px}.people-tabs{display:flex;gap:8px;overflow:auto;margin:0 0 12px}.people-tab{background:#fff;color:#5d6670;border:1px solid #dfe4ea;padding:9px 16px;border-radius:20px;white-space:nowrap}.people-tab.active{background:var(--pink);color:#fff;border-color:var(--pink)}.add-person-panel{margin-bottom:12px}.add-person-panel.hidden{display:none}.person-form{display:flex;gap:14px;align-items:flex-start}.person-avatar-preview{width:58px;height:58px;border-radius:50%;background:#29303a;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;flex:0 0 auto}.person-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1}.people-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}.people-summary>div{background:var(--panel);border:1px solid #272d37;border-radius:10px;padding:12px}.people-summary span{display:block;font-size:9px;letter-spacing:.7px;color:#9da7b5}.people-summary b{display:block;font-size:18px;margin-top:5px}.people-summary>div:first-child b{color:var(--green)}.people-summary>div:nth-child(2) b{color:#ff716f}.people-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}.person-card{display:flex;align-items:center;gap:12px;background:#fff;color:#20252b;border:1px solid #e0e4e8;border-radius:13px;padding:12px;cursor:pointer}.person-card:hover{border-color:#b9c1cb}.person-avatar{width:44px;height:44px;border-radius:50%;background:#edf1f5;display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 auto}.person-main{min-width:0;flex:1}.person-name{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.person-phone{font-size:10px;color:#818a94;margin-top:3px}.person-bal{text-align:right;white-space:nowrap}.person-bal b{display:block;font-size:14px}.person-bal small{display:block;font-size:9px;color:#818a94;margin-top:2px}.person-arrow{font-size:22px;color:#8d96a0}.people-search-card{margin-bottom:12px}.people-search-card input{background:#0f1217}.people-entry-card{margin-top:12px}.history-empty-card{background:#fff;color:#66717c;border:1px dashed #ccd3db;border-radius:13px;text-align:center;padding:30px 15px}.history-empty-card b{display:block;color:#28313b;margin-bottom:5px}
+@media(max-width:650px){.people-hero{padding:14px}.person-form{align-items:stretch}.person-fields{grid-template-columns:1fr}.person-avatar-preview{width:48px;height:48px}.people-summary{grid-template-columns:1fr 1fr 1fr;gap:6px}.people-summary>div{padding:9px}.people-summary b{font-size:15px}.people-summary span{font-size:8px}}
 @media print{
  body.printing-khata>*{display:none!important}
  body.printing-khata #khataModal{display:block!important;position:static!important;padding:0!important;background:#fff!important}
@@ -140,52 +142,64 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 </div></section>
 
 <section id="people" class="hidden">
-<div class="section">📒 Khata — Customers & Suppliers</div>
-<div class="khata-stats">
-  <div class="card"><div class="label">They Owe Me</div><div class="value green" id="khataReceivable">₹0</div></div>
-  <div class="card"><div class="label">I Owe Them</div><div class="value red" id="khataPayable">₹0</div></div>
-  <div class="card"><div class="label">Customers</div><div class="value blue" id="khataCustomers">0</div></div>
-  <div class="card"><div class="label">Suppliers</div><div class="value pink" id="khataSuppliers">0</div></div>
+<div class="section">👥 People / Khata</div>
+<div class="people-hero">
+  <div><b>My Khata</b><div class="people-muted">Customers, suppliers and credit accounts</div></div>
+  <button onclick="showAddPersonPanel()">➕ Add Person</button>
 </div>
-<div class="card" style="margin-bottom:14px">
-  <div class="formgrid">
-    <div class="field"><label>🔎 Search Person</label><input id="partySearch" placeholder="Search name or phone" oninput="renderParties()"></div>
-    <div class="field"><label>Account Type</label><select id="pType"><option value="customer">Customer</option><option value="supplier">Supplier</option><option value="both">Customer + Supplier</option></select></div>
-    <div class="field"><label>Name / Business</label><input id="pName" placeholder="e.g. Rahul Traders"></div>
-    <div class="field"><label>Phone</label><input id="pPhone" placeholder="Phone number"></div>
-    <div class="field"><label>Opening Balance (₹)</label><input id="pOpening" type="number" min="0" value="0"></div>
-    <div class="field"><label>Notes / Address</label><input id="pNotes" placeholder="Optional notes"></div>
+<div class="people-tabs">
+  <button id="peopleAll" class="people-tab active" onclick="setPeopleFilter('all')">All</button>
+  <button id="peopleCustomers" class="people-tab" onclick="setPeopleFilter('customer')">Customers</button>
+  <button id="peopleSuppliers" class="people-tab" onclick="setPeopleFilter('supplier')">Suppliers</button>
+</div>
+<div id="addPersonPanel" class="card add-person-panel hidden">
+  <div class="section" style="margin-top:0">➕ Add New Person</div>
+  <div class="person-form">
+    <div class="person-avatar-preview" id="personAvatarPreview">+</div>
+    <div class="person-fields">
+      <div class="field"><label>Person / Business Name *</label><input id="pName" placeholder="Enter name"></div>
+      <div class="field"><label>Mobile Number</label><input id="pPhone" inputmode="numeric" maxlength="15" placeholder="10-digit mobile number"></div>
+      <div class="field"><label>Account Type</label><select id="pType"><option value="customer">Customer</option><option value="supplier">Supplier</option><option value="both">Customer + Supplier</option></select></div>
+      <div class="field"><label>Opening Balance (₹)</label><input id="pOpening" type="number" min="0" value="0"></div>
+    </div>
   </div>
-  <div style="color:#9da7b5;font-size:11px;margin-top:8px">Opening balance is treated as receivable for customers and payable for suppliers.</div>
-  <div class="actions"><button onclick="addParty()">➕ Add Account</button><button class="secondary" onclick="loadParties()">🔄 Refresh</button></div>
+  <div class="field" style="margin-top:10px"><label>Notes</label><input id="pNotes" placeholder="Optional"></div>
+  <div class="actions"><button onclick="addParty()">Save Person</button><button class="secondary" onclick="hideAddPersonPanel()">Cancel</button></div>
+  <div id="peopleModeNote" class="people-muted" style="margin-top:8px">Accounts are saved to your cloud when connected; otherwise they are saved on this device.</div>
 </div>
-<div class="card" style="margin-bottom:14px">
+<div class="people-summary">
+  <div><span>YOU WILL GET</span><b id="khataReceivable">₹0</b></div>
+  <div><span>YOU WILL GIVE</span><b id="khataPayable">₹0</b></div>
+  <div><span>PEOPLE</span><b id="khataPeopleCount">0</b></div>
+</div>
+<div class="card people-search-card">
+  <input id="partySearch" placeholder="🔎 Search by name or mobile number" oninput="renderParties()">
+</div>
+<div id="peopleList" class="people-list"></div>
+
+<div class="card people-entry-card">
   <div class="section" style="margin-top:0">💳 New Khata Entry</div>
   <div class="formgrid">
-    <div class="field"><label>Account</label><select id="txParty"></select></div>
-    <div class="field"><label>Entry</label><select id="txType"><option value="sell">Credit Sale — Customer owes me</option><option value="buy">Credit Purchase — I owe supplier</option></select></div>
+    <div class="field"><label>Person</label><select id="txParty"></select></div>
+    <div class="field"><label>Entry</label><select id="txType"><option value="sell">You Gave — Credit Sale</option><option value="buy">You Got — Credit Purchase</option></select></div>
     <div class="field"><label>Date</label><input id="txDate" type="date"></div>
     <div class="field"><label>Amount (₹)</label><input id="txAmount" type="number" min="0"></div>
     <div class="field"><label>Paid / Received (₹)</label><input id="txPaid" type="number" min="0" value="0"></div>
-    <div class="field"><label>Note</label><input id="txNotes" placeholder="e.g. Agarbatti 20 boxes"></div>
+    <div class="field"><label>Note</label><input id="txNotes" placeholder="Details"></div>
   </div>
-  <div class="actions"><button onclick="addPartyTransaction()">💾 Save Khata Entry</button></div>
+  <div class="actions"><button onclick="addPartyTransaction()">💾 Save Entry</button></div>
 </div>
-<div class="card" style="margin-bottom:14px">
-  <div class="section" style="margin-top:0">💰 Payment</div>
+<div class="card people-entry-card">
+  <div class="section" style="margin-top:0">💰 Record Payment</div>
   <div class="formgrid">
-    <div class="field"><label>Account</label><select id="payParty"></select></div>
-    <div class="field"><label>Payment Type</label><select id="payDirection"><option value="received">Money Received</option><option value="paid">Money Paid</option></select></div>
+    <div class="field"><label>Person</label><select id="payParty"></select></div>
+    <div class="field"><label>Payment</label><select id="payDirection"><option value="received">You Got — Received</option><option value="paid">You Gave — Paid</option></select></div>
     <div class="field"><label>Date</label><input id="payDate" type="date"></div>
     <div class="field"><label>Amount (₹)</label><input id="payAmount" type="number" min="0"></div>
-    <div class="field"><label>Note</label><input id="payNotes" placeholder="Payment note"></div>
+    <div class="field"><label>Note</label><input id="payNotes" placeholder="Payment details"></div>
   </div>
   <div class="actions"><button onclick="addPartyPayment()">💵 Save Payment</button></div>
 </div>
-<div class="section">👥 My Khata Accounts</div>
-<div class="tablebox"><table style="min-width:1050px"><thead><tr><th>Person</th><th>Type</th><th>Phone</th><th>They Owe Me</th><th>I Owe Them</th><th>Action</th></tr></thead><tbody id="partyRows"></tbody></table></div>
-<div class="section">🧾 Recent Entries</div>
-<div class="tablebox"><table style="min-width:1050px"><thead><tr><th>Date</th><th>Person</th><th>Entry</th><th>Amount</th><th>Paid / Received</th><th>Due</th><th>Note</th><th>Action</th></tr></thead><tbody id="transactionRows"></tbody></table></div>
 
 <div id="khataModal" class="khata-modal hidden" onclick="if(event.target===this)closePartyLedger()">
   <div class="khata-phone">
@@ -222,6 +236,8 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
     <div class="kb-more-actions"><button class="secondary" onclick="quickPartyAction('purchase')">📦 Purchase</button><button class="secondary" onclick="quickPartyAction('paid')">💸 Payment Paid</button><button class="secondary" onclick="exportPartyStatement()">⬇️ Export</button><button class="secondary" onclick="deletePartyAccount()">🗑️ Delete</button></div>
   </div>
 </div>
+</section>
+
 </section>
 <section id="ai" class="hidden">
 <div class="section">🤖 AI Business Assistant</div>
@@ -356,204 +372,71 @@ function quickAI(q){
   sendChat();
 }
 function useExample(t){document.getElementById('chatInput').value=t;sendChat()}
-let parties=[];let partyTransactions=[];let partyPayments=[];let activeLedgerPartyId=null;let khataEditKind=null;let khataEditId=null;
-function partyNet(p){
- const opening=Number(p.opening_balance||0)*(p.party_type==='supplier'?-1:1);
- const tx=partyTransactions.filter(x=>x.party_id===p.id).reduce((s,x)=>s+(x.txn_type==='sell'?1:-1)*(Number(x.due||0)),0);
- const pay=partyPayments.filter(x=>x.party_id===p.id).reduce((s,x)=>s+(x.direction==='received'?-1:1)*Number(x.amount||0),0);
- return opening+tx+pay;
-}
-function partyBalance(p){const net=partyNet(p);return {oweMe:Math.max(0,net),iOwe:Math.max(0,-net),net};}
+const PARTY_LOCAL_KEY='aggarbattiPeople_v2';
+let parties=[];let partyTransactions=[];let partyPayments=[];let activeLedgerPartyId=null;let khataEditKind=null;let khataEditId=null;let peopleFilter='all';
+function readLocalPeople(){try{const x=JSON.parse(localStorage.getItem(PARTY_LOCAL_KEY)||'{}');return {parties:Array.isArray(x.parties)?x.parties:[],tx:Array.isArray(x.tx)?x.tx:[],pay:Array.isArray(x.pay)?x.pay:[]};}catch(e){return {parties:[],tx:[],pay:[]};}}
+function saveLocalPeople(){localStorage.setItem(PARTY_LOCAL_KEY,JSON.stringify({parties,tx:partyTransactions,pay:partyPayments}));}
+function setPeopleFilter(v){peopleFilter=v;document.querySelectorAll('.people-tab').forEach(b=>b.classList.remove('active'));const map={all:'peopleAll',customer:'peopleCustomers',supplier:'peopleSuppliers'};const el=document.getElementById(map[v]);if(el)el.classList.add('active');renderParties();}
+function showAddPersonPanel(){const e=document.getElementById('addPersonPanel');if(e)e.classList.remove('hidden');document.getElementById('pName')?.focus();}
+function hideAddPersonPanel(){const e=document.getElementById('addPersonPanel');if(e)e.classList.add('hidden');}
 async function loadParties(){
- if(!cloudReady||!cloudUser){renderParties();return}
+ const local=readLocalPeople(); if(!cloudReady||!cloudUser){parties=local.parties;partyTransactions=local.tx;partyPayments=local.pay;renderParties();return}
  const [p,t,pay]=await Promise.all([
   cloud.from('parties').select('*').eq('user_id',cloudUser.id).order('name'),
   cloud.from('party_transactions').select('*,parties(name)').eq('user_id',cloudUser.id).order('txn_date',{ascending:false}).order('created_at',{ascending:false}).limit(300),
   cloud.from('party_payments').select('*,parties(name)').eq('user_id',cloudUser.id).order('payment_date',{ascending:false}).order('created_at',{ascending:false}).limit(300)
  ]);
- if(!p.error)parties=p.data||[]; if(!t.error)partyTransactions=t.data||[]; if(!pay.error)partyPayments=pay.data||[]; renderParties();
+ if(p.error||t.error||pay.error){
+   parties=local.parties;partyTransactions=local.tx;partyPayments=local.pay;
+   const n=document.getElementById('peopleModeNote');if(n)n.textContent='Cloud access is unavailable right now. Your People data is being saved on this device.';
+ } else {parties=p.data||[];partyTransactions=t.data||[];partyPayments=pay.data||[];}
+ renderParties();
 }
+function partyNet(p){
+ const opening=Number(p.opening_balance||0)*(p.party_type==='supplier'?-1:1);
+ const tx=partyTransactions.filter(x=>x.party_id===p.id).reduce((s,x)=>s+(x.txn_type==='sell'?1:-1)*Number(x.due||0),0);
+ const pay=partyPayments.filter(x=>x.party_id===p.id).reduce((s,x)=>s+(x.direction==='received'?-1:1)*Number(x.amount||0),0);
+ return opening+tx+pay;
+}
+function partyBalance(p){const net=partyNet(p);return {oweMe:Math.max(0,net),iOwe:Math.max(0,-net),net};}
+function visiblePeople(){const q=(document.getElementById('partySearch')?.value||'').trim().toLowerCase();return parties.filter(p=>{const type=peopleFilter==='all'||p.party_type===peopleFilter||p.party_type==='both';return type&&(p.name+' '+(p.phone||'')).toLowerCase().includes(q);});}
 function renderParties(){
- const q=(document.getElementById('partySearch')?.value||'').trim().toLowerCase();
- const visible=parties.filter(p=>(p.name+' '+(p.phone||'')).toLowerCase().includes(q));
- ['txParty','payParty'].forEach(id=>{
-   const s=document.getElementById(id);
-   if(s)s.innerHTML=parties.map(p=>'<option value="'+p.id+'">'+escapeHTML(p.name)+' — '+p.party_type+'</option>').join('')||'<option value="">Add an account first</option>';
- });
+ const visible=visiblePeople();
+ ['txParty','payParty'].forEach(id=>{const s=document.getElementById(id);if(s)s.innerHTML=parties.map(p=>'<option value="'+p.id+'">'+escapeHTML(p.name)+' — '+p.party_type+'</option>').join('')||'<option value="">Add a person first</option>';});
  const receivable=parties.reduce((s,p)=>s+partyBalance(p).oweMe,0),payable=parties.reduce((s,p)=>s+partyBalance(p).iOwe,0);
- const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
- set('khataReceivable',money(receivable));set('khataPayable',money(payable));
- set('khataCustomers',parties.filter(p=>p.party_type==='customer'||p.party_type==='both').length.toLocaleString('en-IN'));
- set('khataSuppliers',parties.filter(p=>p.party_type==='supplier'||p.party_type==='both').length.toLocaleString('en-IN'));
- const rows=document.getElementById('partyRows');
- if(rows)rows.innerHTML=visible.map(p=>{const b=partyBalance(p);return '<tr><td><b>'+escapeHTML(p.name)+'</b></td><td>'+p.party_type+'</td><td>'+escapeHTML(p.phone||'')+'</td><td class="green">'+money(b.oweMe)+'</td><td class="red">'+money(b.iOwe)+'</td><td><button class="secondary" onclick="openPartyLedger('+p.id+')">📖 Open Khata</button></td></tr>'}).join('')||'<tr><td colspan="6" class="history-empty">No accounts found.</td></tr>';
- const entries=partyTransactions.map(x=>({id:x.id,kind:'tx',date:x.txn_date,name:x.parties?.name||'',entry:x.txn_type==='sell'?'SALE':'PURCHASE',amount:Number(x.amount||0),paid:Number(x.paid||0),due:Number(x.due||0),note:x.notes||''}))
-  .concat(partyPayments.map(x=>({id:x.id,kind:'pay',date:x.payment_date,name:x.parties?.name||'',entry:x.direction==='received'?'PAYMENT RECEIVED':'PAYMENT PAID',amount:Number(x.amount||0),paid:Number(x.amount||0),due:0,note:x.notes||''})))
-  .sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,150);
- const tr=document.getElementById('transactionRows');
- if(tr)tr.innerHTML=entries.map(x=>'<tr><td>'+x.date+'</td><td>'+escapeHTML(x.name)+'</td><td>'+x.entry+'</td><td>'+money(x.amount)+'</td><td>'+money(x.paid)+'</td><td>'+money(x.due)+'</td><td>'+escapeHTML(x.note)+'</td><td><button class="history-edit secondary" onclick="editPartyEntry(\''+x.kind+'\','+x.id+')">✏️</button> <button class="history-edit secondary" onclick="deletePartyEntry(\''+x.kind+'\','+x.id+')">🗑️</button></td></tr>').join('')||'<tr><td colspan="8" class="history-empty">No entries yet.</td></tr>';
+ const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('khataReceivable',money(receivable));set('khataPayable',money(payable));set('khataPeopleCount',parties.length.toLocaleString('en-IN'));
+ const list=document.getElementById('peopleList');
+ list.innerHTML=visible.length?visible.map(p=>{const b=partyBalance(p),net=Math.abs(b.net),label=b.net===0?'Settled':b.net>0?'You will get':'You will give';return '<div class="person-card" onclick="openPartyLedger('+p.id+')"><div class="person-avatar">'+escapeHTML((p.name||'?').trim().charAt(0).toUpperCase())+'</div><div class="person-main"><div class="person-name">'+escapeHTML(p.name)+'</div><div class="person-phone">'+escapeHTML(p.phone||'No mobile number')+'</div></div><div class="person-bal"><b class="'+(b.net>=0?'green':'red')+'">'+money(net)+'</b><small>'+label+'</small></div><div class="person-arrow">›</div></div>'}).join(''):'<div class="history-empty-card"><b>No People Yet</b><span>Tap “➕ Add Person” to create your first customer or supplier.</span></div>';
  if(activeLedgerPartyId)renderKhataLedger();
 }
 async function addParty(){
- if(!cloudReady||!cloudUser){alert('Cloud connection is required.');return}
- const name=document.getElementById('pName').value.trim();if(!name){alert('Enter a name.');return}
- const opening=Math.max(0,Number(document.getElementById('pOpening').value)||0);
- const payload={user_id:cloudUser.id,name,party_type:document.getElementById('pType').value,phone:document.getElementById('pPhone').value.trim(),opening_balance:opening,notes:document.getElementById('pNotes').value.trim()};
- const q=await cloud.from('parties').insert(payload).select().single();
- if(q.error){alert('Could not add account: '+q.error.message);return}
- parties.push(q.data);document.getElementById('pName').value='';document.getElementById('pPhone').value='';document.getElementById('pOpening').value='0';document.getElementById('pNotes').value='';renderParties();
+ const name=document.getElementById('pName').value.trim();if(!name){alert('Enter the person or business name.');return}
+ const opening=Math.max(0,Number(document.getElementById('pOpening').value)||0),type=document.getElementById('pType').value,phone=document.getElementById('pPhone').value.trim(),notes=document.getElementById('pNotes').value.trim();
+ if(cloudReady&&cloudUser){
+   const q=await cloud.from('parties').insert({user_id:cloudUser.id,name,party_type:type,phone,opening_balance:opening,notes}).select().single();
+   if(q.error){alert('Could not save to cloud: '+q.error.message);return}
+   parties.push(q.data);
+ }else{
+   const id=-Date.now();const p={id,user_id:'local',name,party_type:type,phone,address:'',opening_balance:opening,notes,created_at:new Date().toISOString(),updated_at:new Date().toISOString()};parties.push(p);saveLocalPeople();
+ }
+ document.getElementById('pName').value='';document.getElementById('pPhone').value='';document.getElementById('pOpening').value='0';document.getElementById('pNotes').value='';hideAddPersonPanel();renderParties();
 }
 async function addPartyTransaction(){
- if(!cloudReady||!cloudUser){alert('Cloud connection is required.');return}
- const partyId=+document.getElementById('txParty').value,amount=+document.getElementById('txAmount').value||0,paid=+document.getElementById('txPaid').value||0;
- if(!partyId||amount<=0||paid<0||paid>amount){alert('Check account, amount and payment.');return}
- const q=await cloud.from('party_transactions').insert({user_id:cloudUser.id,party_id:partyId,txn_date:document.getElementById('txDate').value||todayISO(),txn_type:document.getElementById('txType').value,amount,paid,notes:document.getElementById('txNotes').value.trim()}).select('*,parties(name)').single();
- if(q.error){alert(q.error.message);return}partyTransactions.unshift(q.data);document.getElementById('txAmount').value='';document.getElementById('txPaid').value=0;document.getElementById('txNotes').value='';renderParties();
+ const partyId=Number(document.getElementById('txParty').value),amount=Number(document.getElementById('txAmount').value)||0,paid=Number(document.getElementById('txPaid').value)||0;
+ if(!partyId||amount<=0||paid<0||paid>amount){alert('Check person, amount and payment.');return}
+ const payload={party_id:partyId,txn_date:document.getElementById('txDate').value||todayISO(),txn_type:document.getElementById('txType').value,amount,paid,notes:document.getElementById('txNotes').value.trim()};
+ if(cloudReady&&cloudUser){const q=await cloud.from('party_transactions').insert({...payload,user_id:cloudUser.id}).select('*,parties(name)').single();if(q.error){alert(q.error.message);return}partyTransactions.unshift(q.data);}
+ else{partyTransactions.unshift({id:-Date.now(),user_id:'local',...payload,due:amount-paid,parties:{name:parties.find(p=>p.id===partyId)?.name||''},created_at:new Date().toISOString()});saveLocalPeople();}
+ document.getElementById('txAmount').value='';document.getElementById('txPaid').value=0;document.getElementById('txNotes').value='';renderParties();
 }
 async function addPartyPayment(){
- if(!cloudReady||!cloudUser){alert('Cloud connection is required.');return}
- const partyId=+document.getElementById('payParty').value,amount=+document.getElementById('payAmount').value||0;
- if(!partyId||amount<=0){alert('Select an account and enter an amount.');return}
- const q=await cloud.from('party_payments').insert({user_id:cloudUser.id,party_id:partyId,payment_date:document.getElementById('payDate').value||todayISO(),direction:document.getElementById('payDirection').value,amount,notes:document.getElementById('payNotes').value.trim()}).select('*,parties(name)').single();
- if(q.error){alert(q.error.message);return}partyPayments.unshift(q.data);document.getElementById('payAmount').value='';document.getElementById('payNotes').value='';renderParties();
+ const partyId=Number(document.getElementById('payParty').value),amount=Number(document.getElementById('payAmount').value)||0;if(!partyId||amount<=0){alert('Select a person and enter an amount.');return}
+ const payload={party_id:partyId,payment_date:document.getElementById('payDate').value||todayISO(),direction:document.getElementById('payDirection').value,amount,notes:document.getElementById('payNotes').value.trim()};
+ if(cloudReady&&cloudUser){const q=await cloud.from('party_payments').insert({...payload,user_id:cloudUser.id}).select('*,parties(name)').single();if(q.error){alert(q.error.message);return}partyPayments.unshift(q.data);}
+ else{partyPayments.unshift({id:-Date.now(),user_id:'local',...payload,parties:{name:parties.find(p=>p.id===partyId)?.name||''},created_at:new Date().toISOString()});saveLocalPeople();}
+ document.getElementById('payAmount').value='';document.getElementById('payNotes').value='';renderParties();
 }
 function todayISO(){return new Date().toISOString().slice(0,10)}
-function closePartyLedger(){const m=document.getElementById('khataModal');if(m)m.classList.add('hidden');activeLedgerPartyId=null;khataEditKind=null;khataEditId=null;}
-let khataFilter='all';
-function openPartyFilters(){const e=document.getElementById('kbDateFilters');if(e)e.classList.toggle('hidden');}
-function setKhataFilter(v){
- khataFilter=v;
- ['All','Gave','Got','Settled'].forEach(x=>{const el=document.getElementById('kbFilter'+x);if(el)el.classList.toggle('active',(v==='all'&&x==='All')||(v==='gave'&&x==='Gave')||(v==='got'&&x==='Got')||(v==='settled'&&x==='Settled'));});
- renderKhataLedger();
-}
-function openPartyLedger(id){
- const p=parties.find(x=>x.id===id);if(!p)return;
- activeLedgerPartyId=id;khataEditKind=null;khataEditId=null;khataFilter='all';
- document.getElementById('khataModal').classList.remove('hidden');
- document.getElementById('khataTitle').textContent=p.name;
- document.getElementById('khataSub').textContent=(p.phone||'')+(p.phone?' • ':'')+p.party_type.toUpperCase();
- document.getElementById('khataAvatar').textContent=(p.name||'A').trim().charAt(0).toUpperCase();
- const dates=partyLedgerEntries(p).filter(x=>x.kind!=='opening').map(x=>x.date).sort();
- document.getElementById('khataFrom').value=dates[0]||'';document.getElementById('khataTo').value=dates.slice(-1)[0]||'';document.getElementById('khataSearch').value='';
- setKhataFilter('all');
-}
-function partyLedgerEntries(p){
- const rows=[],opening=Number(p.opening_balance||0)*(p.party_type==='supplier'?-1:1);
- if(opening)rows.push({kind:'opening',id:0,date:'0000-00-00',details:'Opening Balance',amount:Math.abs(opening),payment:0,signed:opening,note:'Balance brought forward'});
- partyTransactions.filter(x=>x.party_id===p.id).forEach(x=>{const due=Number(x.due||0),signed=(x.txn_type==='sell'?1:-1)*due;rows.push({kind:'tx',id:x.id,date:x.txn_date,details:x.txn_type==='sell'?'Sale / You Gave':'Purchase / You Got',amount:Number(x.amount||0),payment:Number(x.paid||0),signed,note:x.notes||'',txType:x.txn_type});});
- partyPayments.filter(x=>x.party_id===p.id).forEach(x=>{const a=Number(x.amount||0),signed=x.direction==='received'?-a:a;rows.push({kind:'pay',id:x.id,date:x.payment_date,details:x.direction==='received'?'Payment Received / You Got':'Payment Paid / You Gave',amount:a,payment:a,signed,note:x.notes||'',direction:x.direction});});
- rows.sort((a,b)=>String(a.date).localeCompare(String(b.date))||((a.kind==='opening'?0:1)-(b.kind==='opening'?0:1)));
- let run=opening;return rows.map(r=>{if(r.kind!=='opening')run+=r.signed;return {...r,running:run};});
-}
-function renderKhataLedger(){
- const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p)return;
- const b=partyBalance(p),net=Math.abs(b.net);
- document.getElementById('kbNetBalance').textContent=money(net);
- document.getElementById('kbBalanceText').textContent=net===0?'Settled':(b.net>=0?'You will get this amount':'You will give this amount');
- document.getElementById('kbGet').textContent=money(b.oweMe);document.getElementById('kbGive').textContent=money(b.iOwe);
- const from=document.getElementById('khataFrom').value,to=document.getElementById('khataTo').value,q=(document.getElementById('khataSearch').value||'').toLowerCase();
- let rows=partyLedgerEntries(p).filter(x=>x.kind==='opening'||((!from||x.date>=from)&&(!to||x.date<=to))&&(!q||(x.details+' '+x.note).toLowerCase().includes(q)));
- if(khataFilter==='gave')rows=rows.filter(x=>x.kind==='opening'||x.signed<0);
- if(khataFilter==='got')rows=rows.filter(x=>x.kind==='opening'||x.signed>0);
- if(khataFilter==='settled')rows=rows.filter(x=>x.kind==='opening'||x.running===0);
- const box=document.getElementById('khataLedgerRows');
- if(!rows.length){box.innerHTML='<div style="padding:40px 20px;text-align:center;color:#929ba5;font-size:12px">No transactions found.</div>';return;}
- rows.reverse();
- box.innerHTML=rows.map(x=>{
-   const gave=x.kind==='tx'?x.txType==='sell':x.kind==='pay'?x.direction==='paid':x.signed<0;
-   const cls=gave?'gave':'got',icon=gave?'↑':'↓',label=x.kind==='opening'?'Opening Balance':(gave?'You Gave':'You Got');
-   const amt=x.kind==='opening'?x.amount:Math.abs(x.signed||x.amount);
-   const action=x.kind==='opening'?'':'<div class="kb-txn-actions"><button onclick="editPartyEntry(\''+x.kind+'\','+x.id+')">✎ Edit</button><button onclick="deletePartyEntry(\''+x.kind+'\','+x.id+')">Delete</button></div>';
-   return '<div class="kb-txn"><div class="kb-txn-dot '+cls+'">'+icon+'</div><div class="kb-txn-main"><div class="kb-txn-title">'+escapeHTML(label)+'</div><div class="kb-txn-note">'+escapeHTML(x.details)+(x.note?' • '+escapeHTML(x.note):'')+'</div><div class="kb-txn-date">'+(x.kind==='opening'?'Balance brought forward':x.date)+'</div>'+action+'</div><div class="kb-txn-amt"><b class="'+(gave?'red':'green')+'">'+(gave?'-':'+')+money(amt)+'</b><small>Balance '+money(Math.abs(x.running))+'</small></div></div>';
- }).join('');
-}
-function quickPartyAction(action){
- const id=activeLedgerPartyId;if(!id)return;
- closePartyLedger();showTab('people',document.querySelector('.tab:nth-child(4)'));
- if(action==='sale'||action==='purchase'){document.getElementById('txParty').value=id;document.getElementById('txType').value=action==='sale'?'sell':'buy';document.getElementById('txDate').value=todayISO();document.getElementById('txAmount').focus();document.getElementById('txAmount').scrollIntoView({behavior:'smooth',block:'center'});}
- else {document.getElementById('payParty').value=id;document.getElementById('payDirection').value=action;document.getElementById('payDate').value=todayISO();document.getElementById('payAmount').focus();document.getElementById('payAmount').scrollIntoView({behavior:'smooth',block:'center'});}
-}
-function startEditPartyAccount(){
- const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p)return;
- khataEditKind='account';khataEditId=p.id;
- document.getElementById('khataEditor').classList.remove('hidden');
- document.getElementById('khataEditor').innerHTML='<div class="section" style="margin-top:0">✏️ Edit Account</div><div class="formgrid"><div class="field"><label>Name</label><input id="keName" value="'+escapeHTML(p.name)+'"></div><div class="field"><label>Type</label><select id="keType"><option value="customer">Customer</option><option value="supplier">Supplier</option><option value="both">Customer + Supplier</option></select></div><div class="field"><label>Phone</label><input id="kePhone" value="'+escapeHTML(p.phone||'')+'"></div><div class="field"><label>Opening Balance (₹)</label><input id="keOpening" type="number" min="0" value="'+Number(p.opening_balance||0)+'"></div><div class="field"><label>Notes</label><input id="keNotes" value="'+escapeHTML(p.notes||'')+'"></div></div><div class="actions"><button onclick="saveKhataEdit()">💾 Save Account</button><button class="secondary" onclick="closeKhataEditor()">Cancel</button></div>';
- document.getElementById('keType').value=p.party_type;
-}
-function closeKhataEditor(){const e=document.getElementById('khataEditor');if(e)e.classList.add('hidden');khataEditKind=null;khataEditId=null;}
-function editPartyEntry(kind,id){
- const p=parties.find(x=>x.id===activeLedgerPartyId)||null;
- if(p){const m=document.getElementById('khataModal');if(m.classList.contains('hidden'))openPartyLedger(p.id);}
- khataEditKind=kind;khataEditId=id;
- const e=document.getElementById('khataEditor');e.classList.remove('hidden');
- if(kind==='tx'){
-   const x=partyTransactions.find(v=>v.id===id);if(!x)return;
-   e.innerHTML='<div class="section" style="margin-top:0">✏️ Edit '+(x.txn_type==='sell'?'Sale':'Purchase')+'</div><div class="formgrid"><div class="field"><label>Type</label><select id="keTxType"><option value="sell">Credit Sale</option><option value="buy">Credit Purchase</option></select></div><div class="field"><label>Date</label><input id="keDate" type="date" value="'+x.txn_date+'"></div><div class="field"><label>Amount (₹)</label><input id="keAmount" type="number" min="0" value="'+Number(x.amount||0)+'"></div><div class="field"><label>Paid / Received (₹)</label><input id="kePaid" type="number" min="0" value="'+Number(x.paid||0)+'"></div><div class="field"><label>Note</label><input id="keNotes" value="'+escapeHTML(x.notes||'')+'"></div></div><div class="actions"><button onclick="saveKhataEdit()">💾 Save Entry</button><button class="secondary" onclick="closeKhataEditor()">Cancel</button></div>';
-   document.getElementById('keTxType').value=x.txn_type;
- }else{
-   const x=partyPayments.find(v=>v.id===id);if(!x)return;
-   e.innerHTML='<div class="section" style="margin-top:0">✏️ Edit Payment</div><div class="formgrid"><div class="field"><label>Payment Type</label><select id="keDirection"><option value="received">Money Received</option><option value="paid">Money Paid</option></select></div><div class="field"><label>Date</label><input id="keDate" type="date" value="'+x.payment_date+'"></div><div class="field"><label>Amount (₹)</label><input id="keAmount" type="number" min="0" value="'+Number(x.amount||0)+'"></div><div class="field"><label>Note</label><input id="keNotes" value="'+escapeHTML(x.notes||'')+'"></div></div><div class="actions"><button onclick="saveKhataEdit()">💾 Save Payment</button><button class="secondary" onclick="closeKhataEditor()">Cancel</button></div>';
-   document.getElementById('keDirection').value=x.direction;
- }
-}
-async function saveKhataEdit(){
- if(!cloudReady||!cloudUser||!khataEditKind)return;
- let q;
- if(khataEditKind==='account'){
-   const name=document.getElementById('keName').value.trim();if(!name){alert('Enter a name.');return}
-   q=await cloud.from('parties').update({name,party_type:document.getElementById('keType').value,phone:document.getElementById('kePhone').value.trim(),opening_balance:Math.max(0,Number(document.getElementById('keOpening').value)||0),notes:document.getElementById('keNotes').value.trim(),updated_at:new Date().toISOString()}).eq('id',khataEditId).eq('user_id',cloudUser.id).select().single();
-   if(q.error){alert(q.error.message);return}
-   parties=parties.map(p=>p.id===khataEditId?q.data:p);closeKhataEditor();openPartyLedger(khataEditId);renderParties();return;
- }
- if(khataEditKind==='tx'){
-   const amount=Math.max(0,Number(document.getElementById('keAmount').value)||0),paid=Math.max(0,Number(document.getElementById('kePaid').value)||0);if(amount<=0||paid>amount){alert('Check amount and payment.');return}
-   q=await cloud.from('party_transactions').update({txn_type:document.getElementById('keTxType').value,txn_date:document.getElementById('keDate').value||todayISO(),amount,paid,notes:document.getElementById('keNotes').value.trim()}).eq('id',khataEditId).eq('user_id',cloudUser.id).select('*,parties(name)').single();
-   if(q.error){alert(q.error.message);return}
-   partyTransactions=partyTransactions.map(x=>x.id===khataEditId?q.data:x);
- }else{
-   const amount=Math.max(0,Number(document.getElementById('keAmount').value)||0);if(amount<=0){alert('Enter a valid amount.');return}
-   q=await cloud.from('party_payments').update({direction:document.getElementById('keDirection').value,payment_date:document.getElementById('keDate').value||todayISO(),amount,notes:document.getElementById('keNotes').value.trim()}).eq('id',khataEditId).eq('user_id',cloudUser.id).select('*,parties(name)').single();
-   if(q.error){alert(q.error.message);return}
-   partyPayments=partyPayments.map(x=>x.id===khataEditId?q.data:x);
- }
- closeKhataEditor();renderParties();
-}
-async function deletePartyEntry(kind,id){
- if(!cloudReady||!cloudUser)return;
- if(!confirm('Delete this entry? This cannot be undone.'))return;
- const table=kind==='tx'?'party_transactions':'party_payments';
- const q=await cloud.from(table).delete().eq('id',id).eq('user_id',cloudUser.id).select().single();
- if(q.error){alert(q.error.message);return}
- if(kind==='tx')partyTransactions=partyTransactions.filter(x=>x.id!==id);else partyPayments=partyPayments.filter(x=>x.id!==id);
- renderParties();
-}
-async function deletePartyAccount(){
- const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p||!cloudReady||!cloudUser)return;
- if(!confirm('Delete '+p.name+' and all its khata entries? This cannot be undone.'))return;
- const q=await cloud.from('parties').delete().eq('id',p.id).eq('user_id',cloudUser.id).select().single();
- if(q.error){alert(q.error.message);return}
- parties=parties.filter(x=>x.id!==p.id);partyTransactions=partyTransactions.filter(x=>x.party_id!==p.id);partyPayments=partyPayments.filter(x=>x.party_id!==p.id);closePartyLedger();renderParties();
-}
-function statementLines(p){
- const b=partyBalance(p),rows=partyLedgerEntries(p).filter(x=>x.kind!=='opening'||Number(p.opening_balance||0));
- const lines=['AGARBATTI BUSINESS — KHATA STATEMENT','Account: '+p.name,'Type: '+p.party_type+(p.phone?' | Phone: '+p.phone:''),'They Owe Me: '+money(b.oweMe),'I Owe Them: '+money(b.iOwe),'Net: '+money(Math.abs(b.net))+' '+(b.net>=0?'Receivable':'Payable'),'','DATE | DETAILS | AMOUNT | PAID/PAYMENT | BALANCE'];
- rows.forEach(x=>lines.push((x.kind==='opening'?'Opening':x.date)+' | '+x.details.replace(/^[^ ]+ /,'')+' | '+money(x.amount)+' | '+money(x.payment)+' | '+money(Math.abs(x.running))+' '+(x.running>=0?'Receivable':'Payable')));
- return lines.join('\n');
-}
-function exportPartyStatement(){
- const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p)return;
- const rows=partyLedgerEntries(p).filter(x=>x.kind!=='opening'||Number(p.opening_balance||0)).map(x=>[x.kind==='opening'?'Opening':x.date,x.details, x.amount, x.payment, x.running>=0?'Receivable':'Payable',Math.abs(x.running),x.note]);
- const csv=[['Date','Details','Amount','Paid / Payment','Balance Type','Balance','Note'],...rows].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');
- const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='khata-'+p.name.replace(/[^a-z0-9]+/gi,'-')+'.csv';a.click();URL.revokeObjectURL(url);
-}
-function sharePartyStatement(){
- const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p)return;
- const text=statementLines(p);window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank','noopener');
-}
-function printPartyStatement(){
- const p=parties.find(x=>x.id===activeLedgerPartyId);if(!p)return;
- document.body.classList.add('printing-khata');window.print();setTimeout(()=>document.body.classList.remove('printing-khata'),500);
-}
 function todayEntry(){let t=new Date().toISOString().slice(0,10);return data.find(x=>x.date===t)||null}
 function commandResponse(raw){let q=raw.toLowerCase().trim();let t=new Date().toISOString().slice(0,10);let e=todayEntry();
  if(q.includes('analyze')||q.includes('analysis')||q.includes('business report')){refreshAI();let el=document.getElementById('insights');let txt=[...el.querySelectorAll('.insight')].map(x=>x.innerText).join('\n');return 'Business analysis:\n'+txt}
