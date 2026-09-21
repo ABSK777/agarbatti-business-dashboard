@@ -53,7 +53,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
     <p>Sign in to securely sync your Agarbatti business data across devices.</p>
     <input id="authEmail" type="email" placeholder="Email address" autocomplete="email">
     <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password">
-    <div class="actions"><button onclick="signIn()">Sign In</button><button class="secondary" onclick="signUp()">Create Account</button></div>
+    <div class="actions"><button onclick="signIn()">Sign In</button><button class="secondary" onclick="signUp()">Create Account</button><button class="secondary" onclick="resendConfirmation()">Resend Email</button></div>
     <div id="authMessage" class="auth-message"></div>
   </div>
 </div>
@@ -65,7 +65,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><input id="chatInput" placeholder="Type a command…" onkeydown="if(event.key==='Enter')sendChat()"><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 1.2</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 1.3</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -201,9 +201,19 @@ async function signUp(){
   if(!cloudReady){authMsg('Supabase is not configured.');return}
   const email=document.getElementById('authEmail').value.trim(), password=document.getElementById('authPassword').value;
   if(!email||password.length<6){authMsg('Enter an email and a password of at least 6 characters.');return}
-  const {data:res,error}=await cloud.auth.signUp({email,password});
+  const redirectTo=window.location.origin+window.location.pathname;
+  const {data:res,error}=await cloud.auth.signUp({email,password,options:{emailRedirectTo:redirectTo}});
   if(error){authMsg(error.message);return}
-  if(res.session){closeAuth();}else authMsg('Account created. Check your email if email confirmation is enabled.',true);
+  if(res.session){closeAuth();}else authMsg('Account created. Check your email (and Spam/Junk). Then click the confirmation link and come back to Sign In.',true);
+}
+async function resendConfirmation(){
+  if(!cloudReady){authMsg('Supabase is not configured.');return}
+  const email=document.getElementById('authEmail').value.trim();
+  if(!email){authMsg('Enter your email address first.');return}
+  const redirectTo=window.location.origin+window.location.pathname;
+  const {error}=await cloud.auth.resend({type:'signup',email,options:{emailRedirectTo:redirectTo}});
+  if(error){authMsg(error.message);return}
+  authMsg('Confirmation email sent. Check Inbox and Spam/Junk.',true);
 }
 async function signOut(){
   if(cloud)await cloud.auth.signOut();
@@ -284,7 +294,7 @@ function showTab(id,btn){['dash','entry','history','ai'].forEach(x=>document.get
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='1.2';
+const APP_VERSION='1.3';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking…';
