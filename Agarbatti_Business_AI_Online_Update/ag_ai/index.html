@@ -33,6 +33,10 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 .chat-body{flex:1;overflow:auto;padding:14px}.msg{margin:8px 0;display:flex}.msg.user{justify-content:flex-end}.bubble{max-width:88%;padding:10px 12px;border-radius:12px;line-height:1.4;font-size:13px;white-space:pre-wrap}.msg.ai .bubble{background:#202631}.msg.user .bubble{background:var(--pink)}
 .chat-input{padding:10px;border-top:1px solid #292f39;display:flex;gap:7px}.chat-input input{flex:1}.chat-input button{padding:9px 11px}.chat-examples{padding:0 14px 10px;color:var(--muted);font-size:11px}.chat-examples span{display:inline-block;border:1px solid #343b46;border-radius:12px;padding:5px 8px;margin:3px;cursor:pointer}
 .chat-panel.hidden,.chat-toggle.hidden{display:none}
+.auth-panel{position:fixed;inset:0;background:#000b;z-index:50;display:grid;place-items:center;padding:18px}
+.auth-card{width:min(420px,100%);background:#171b23;border:1px solid #343b46;border-radius:16px;padding:24px;box-shadow:0 20px 60px #000b;position:relative}
+.auth-card h2{margin:0 0 8px}.auth-card p{color:#9da7b5;font-size:13px;line-height:1.5}.auth-card input{margin:6px 0}.auth-close{position:absolute;right:14px;top:14px;padding:7px 10px}.auth-message{margin-top:10px;color:#ffd166;font-size:12px;line-height:1.5}
+.auth-user{color:#9da7b5;font-size:11px}
 @media(max-width:520px){.chat-panel{right:10px;bottom:70px;width:calc(100vw - 20px);height:70vh}.chat-toggle{right:12px;bottom:12px}}
 
 .analysis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}.analysis-stat{background:#11151c;border:1px solid #303744;border-radius:9px;padding:10px}.analysis-stat small{color:#9da7b5}.analysis-stat b{display:block;font-size:18px;margin-top:5px}.analysis-block{border-top:1px solid #342936;padding:11px 0}.analysis-block h4{margin:0 0 7px}.good{color:#35c98b}.warn{color:#ffd166}.bad{color:#ff716f}.analysis-bar{height:7px;background:#303640;border-radius:99px;overflow:hidden}.analysis-bar span{display:block;height:100%;background:#2d9cdb}.history-edit{padding:6px 9px;font-size:11px}.history-empty{color:#9da7b5;padding:18px}
@@ -41,7 +45,18 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 </style>
 </head>
 <body>
-<header><h1>🪔 AGARBATTI BUSINESS — AI DASHBOARD</h1><div><span class="status" id="status">● Local data ready</span></div></header>
+<header><h1>🪔 AGARBATTI BUSINESS — AI DASHBOARD</h1><div style="display:flex;align-items:center;gap:10px"><span class="status" id="status">● Cloud sign-in required</span><button id="authBtn" class="secondary" onclick="openAuth()">Sign in</button></div></header>
+<div id="authPanel" class="auth-panel hidden">
+  <div class="auth-card">
+    <button class="secondary auth-close" onclick="closeAuth()">✕</button>
+    <h2>☁️ Cloud Dashboard Login</h2>
+    <p>Sign in to securely sync your Agarbatti business data across devices.</p>
+    <input id="authEmail" type="email" placeholder="Email address" autocomplete="email">
+    <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password">
+    <div class="actions"><button onclick="signIn()">Sign In</button><button class="secondary" onclick="signUp()">Create Account</button></div>
+    <div id="authMessage" class="auth-message"></div>
+  </div>
+</div>
 <button id="chatToggle" class="chat-toggle" onclick="toggleChat()">🤖 Ask AI</button>
 <div id="chatPanel" class="chat-panel hidden">
   <div class="chat-head"><div><b>🤖 Agarbatti AI</b><br><small>Ask questions or give business commands</small></div><button class="secondary" onclick="toggleChat()">✕</button></div>
@@ -116,8 +131,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 </section>
 </div>
 <script>
-const KEY='aggarbattiBusinessData';
-const FLAVOUR_KEY='aggarbattiFlavours_v1';
+const KEY='aggarbattiBusinessData';const FLAVOUR_KEY='aggarbattiFlavours_v1';
 const DEFAULT_FLAVOURS=['Rose','Chandan','Mogra','Lavender','Premium Mix'];
 let flavours=JSON.parse(localStorage.getItem(FLAVOUR_KEY)||'null');
 if(!Array.isArray(flavours)||!flavours.length){flavours=[...DEFAULT_FLAVOURS];localStorage.setItem(FLAVOUR_KEY,JSON.stringify(flavours));}
@@ -144,6 +158,8 @@ renderFlavours();
 let sc,st;
 let cloud=null;
 let cloudReady=false;
+let cloudUser=null;
+let authInitialized=false;
 try{
   if(window.SUPABASE_URL && window.SUPABASE_ANON_KEY && !window.SUPABASE_URL.includes('YOUR_')){
     cloud=supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY);
@@ -151,8 +167,8 @@ try{
   }
 }catch(e){console.warn('Cloud setup error',e)}
 async function loadCloud(){
-  if(!cloudReady)return;
-  const {data:rows,error}=await cloud.from('daily_entries').select('*').order('date',{ascending:true});
+  if(!cloudReady || !cloudUser)return;
+  const {data:rows,error}=await cloud.from('daily_entries').select('*').eq('user_id',cloudUser.id).order('date',{ascending:true});
   if(error){console.warn(error);return}
   if(rows && rows.length){
     data=rows.map(x=>({date:x.date,sales:x.sales,orders:x.orders,units:x.units,production:x.production,raw:x.raw,rawCost:x.raw_cost,pack:x.pack,labour:x.labour,other:x.other,expenses:x.expenses,profit:x.profit,stock:x.stock,recv:x.recv,pay:x.pay,damaged:x.damaged,product:x.product}));
@@ -161,11 +177,53 @@ async function loadCloud(){
   }
 }
 async function saveCloud(e){
-  if(!cloudReady)return;
-  const row={date:e.date,sales:e.sales,orders:e.orders,units:e.units,production:e.production,raw:e.raw,raw_cost:e.rawCost,pack:e.pack,labour:e.labour,other:e.other,expenses:e.expenses,profit:e.profit,stock:e.stock,recv:e.recv,pay:e.pay,damaged:e.damaged,product:e.product};
+  if(!cloudReady || !cloudUser){return false}
+  const row={user_id:cloudUser.id,date:e.date,sales:e.sales,orders:e.orders,units:e.units,production:e.production,raw:e.raw,raw_cost:e.rawCost,pack:e.pack,labour:e.labour,other:e.other,expenses:e.expenses,profit:e.profit,stock:e.stock,recv:e.recv,pay:e.pay,damaged:e.damaged,product:e.product};
   const {error}=await cloud.from('daily_entries').upsert(row,{onConflict:'date'});
-  if(error)alert('Saved on this device, but cloud save failed: '+error.message);
-  else document.getElementById('status').textContent='● Cloud backup saved';
+  if(error){console.warn(error);alert('Saved on this device, but cloud save failed: '+error.message);return false}
+  document.getElementById('status').textContent='● Cloud backup saved';
+  return true;
+}
+function openAuth(){document.getElementById('authPanel').classList.remove('hidden');}
+function closeAuth(){document.getElementById('authPanel').classList.add('hidden');}
+function authMsg(msg,ok=false){const el=document.getElementById('authMessage');if(el){el.textContent=msg;el.style.color=ok?'#35c98b':'#ffd166';}}
+async function signIn(){
+  if(!cloudReady){authMsg('Supabase is not configured.');return}
+  const email=document.getElementById('authEmail').value.trim(), password=document.getElementById('authPassword').value;
+  if(!email||!password){authMsg('Enter your email and password.');return}
+  const {error}=await cloud.auth.signInWithPassword({email,password});
+  if(error){authMsg(error.message);return}
+  closeAuth();
+}
+async function signUp(){
+  if(!cloudReady){authMsg('Supabase is not configured.');return}
+  const email=document.getElementById('authEmail').value.trim(), password=document.getElementById('authPassword').value;
+  if(!email||password.length<6){authMsg('Enter an email and a password of at least 6 characters.');return}
+  const {data:res,error}=await cloud.auth.signUp({email,password});
+  if(error){authMsg(error.message);return}
+  if(res.session){closeAuth();}else authMsg('Account created. Check your email if email confirmation is enabled.',true);
+}
+async function signOut(){
+  if(cloud)await cloud.auth.signOut();
+}
+async function initCloudAuth(){
+  if(!cloudReady){document.getElementById('status').textContent='● Local data ready';return}
+  const {data:{session}}=await cloud.auth.getSession();
+  await handleAuthSession(session);
+  cloud.auth.onAuthStateChange((_event,nextSession)=>{setTimeout(()=>handleAuthSession(nextSession),0)});
+}
+async function handleAuthSession(session){
+  cloudUser=session?.user||null;
+  const btn=document.getElementById('authBtn');
+  if(!cloudUser){
+    document.getElementById('status').textContent='● Sign in for cloud sync';
+    btn.textContent='Sign in';btn.onclick=openAuth;
+    authInitialized=true;return;
+  }
+  btn.textContent='Sign out';btn.onclick=signOut;
+  document.getElementById('status').textContent='● Cloud connected';
+  authInitialized=true;
+  await loadCloud();
 }
 const money=n=>'₹'+Math.round(n||0).toLocaleString('en-IN');
 function render(){data.sort((a,b)=>a.date.localeCompare(b.date));let sales=data.reduce((s,x)=>s+x.sales,0),profit=data.reduce((s,x)=>s+x.profit,0),units=data.reduce((s,x)=>s+x.units,0),orders=data.reduce((s,x)=>s+x.orders,0),stock=data.length?data[data.length-1].stock:0;
@@ -205,7 +263,14 @@ function commandResponse(raw){let q=raw.toLowerCase().trim();let t=new Date().to
  return null}
 async function sendChat(){let input=document.getElementById('chatInput');let q=input.value.trim();if(!q)return;addChat('user',q);input.value='';let answer=commandResponse(q);if(answer!==null){addChat('ai',answer);return}addChat('ai','Thinking…');try{let r=await askRealAI(q);let msgs=document.querySelectorAll('#chatBody .msg.ai .bubble');if(msgs.length)msgs[msgs.length-1].innerHTML=escapeHTML(r).replace(/\n/g,'<br>')}catch(err){let msgs=document.querySelectorAll('#chatBody .msg.ai .bubble');if(msgs.length)msgs[msgs.length-1].innerHTML='AI connection failed: '+escapeHTML(err.message)+'<br><small>Check your Supabase Edge Function and OpenAI API secret.</small>'}}
 function escapeHTML(s){return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]))}
-async function askRealAI(message){if(!cloudReady)throw new Error('Connect Supabase first.');let base=window.SUPABASE_URL.replace(/\/$/,'');let fn=window.AI_FUNCTION_NAME||'ai-chat';let url=base+'/functions/v1/'+fn;let headers={'Content-Type':'application/json','apikey':window.SUPABASE_ANON_KEY,'Authorization':'Bearer '+window.SUPABASE_ANON_KEY};let r=await fetch(url,{method:'POST',headers,body:JSON.stringify({message,businessData:data})});let body=await r.json();if(!r.ok||body.error)throw new Error(body.error||'AI request failed');return body.reply||'No AI response.'}
+async function askRealAI(message){
+  if(!cloudReady)throw new Error('Connect Supabase first.');
+  if(!cloudUser)throw new Error('Please sign in to use the cloud AI assistant.');
+  const {data:{session}}=await cloud.auth.getSession();
+  if(!session?.access_token)throw new Error('Your session has expired. Please sign in again.');
+  let base=window.SUPABASE_URL.replace(/\/$/,'');let fn=window.AI_FUNCTION_NAME||'ai-chat';let url=base+'/functions/v1/'+fn;
+  let headers={'Content-Type':'application/json','apikey':window.SUPABASE_ANON_KEY,'Authorization':'Bearer '+session.access_token};
+  let r=await fetch(url,{method:'POST',headers,body:JSON.stringify({message})});let body=await r.json();if(!r.ok||body.error)throw new Error(body.error||'AI request failed');return body.reply||'No AI response.'}
 function voiceCommand(){if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){addChat('ai','Voice input is not supported in this browser.');return}let R=window.SpeechRecognition||window.webkitSpeechRecognition;let r=new R();r.lang='en-IN';r.onresult=e=>{document.getElementById('chatInput').value=e.results[0][0].transcript;sendChat()};r.start()}
 
 function renderHistory(){let body=document.getElementById('historyRows');if(!body)return;let q=(document.getElementById('historySearch')?.value||'').toLowerCase();let list=[...data].sort((a,b)=>b.date.localeCompare(a.date)).filter(x=>!q||x.date.toLowerCase().includes(q)||(x.product||'').toLowerCase().includes(q));if(!list.length){body.innerHTML='<tr><td colspan="10" class="history-empty">No past entries found.</td></tr>';return}body.innerHTML=list.map(x=>`<tr><td>${x.date}</td><td>${money(x.sales)}</td><td>${x.orders}</td><td>${x.units}</td><td>${x.production}</td><td>${money(x.expenses)}</td><td>${money(x.profit)}</td><td>${x.stock}</td><td>${x.product||''}</td><td><button class="history-edit" onclick="editEntry('${x.date}')">Edit</button></td></tr>`).join('')}
@@ -239,6 +304,6 @@ if('serviceWorker' in navigator){
   window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 
-document.getElementById('fDate').value=new Date().toISOString().slice(0,10);render();loadCloud();
+document.getElementById('fDate').value=new Date().toISOString().slice(0,10);render();initCloudAuth();
 </script>
 </body></html>
