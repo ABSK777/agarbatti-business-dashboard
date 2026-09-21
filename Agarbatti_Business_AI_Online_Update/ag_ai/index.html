@@ -179,7 +179,7 @@ async function loadCloud(){
 async function saveCloud(e){
   if(!cloudReady || !cloudUser){return false}
   const row={user_id:cloudUser.id,date:e.date,sales:e.sales,orders:e.orders,units:e.units,production:e.production,raw:e.raw,raw_cost:e.rawCost,pack:e.pack,labour:e.labour,other:e.other,expenses:e.expenses,profit:e.profit,stock:e.stock,recv:e.recv,pay:e.pay,damaged:e.damaged,product:e.product};
-  const {error}=await cloud.from('daily_entries').upsert(row,{onConflict:'date'});
+  const {error}=await cloud.from('daily_entries').upsert(row,{onConflict:'user_id,date'});
   if(error){console.warn(error);alert('Saved on this device, but cloud save failed: '+error.message);return false}
   document.getElementById('status').textContent='● Cloud backup saved';
   return true;
