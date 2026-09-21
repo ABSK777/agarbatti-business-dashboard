@@ -36,7 +36,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 .auth-panel{position:fixed;inset:0;background:#000b;z-index:50;display:grid;place-items:center;padding:18px}
 .auth-card{width:min(420px,100%);background:#171b23;border:1px solid #343b46;border-radius:16px;padding:24px;box-shadow:0 20px 60px #000b;position:relative}
 .auth-card h2{margin:0 0 8px}.auth-card p{color:#9da7b5;font-size:13px;line-height:1.5}.auth-card input{margin:6px 0}.auth-close{position:absolute;right:14px;top:14px;padding:7px 10px}.auth-message{margin-top:10px;color:#ffd166;font-size:12px;line-height:1.5}
-.auth-user{color:#9da7b5;font-size:11px}
+.auth-user{color:#9da7b5;font-size:11px}.theme-control{width:auto;min-width:128px;padding:8px 10px;border-color:#343b46;background:#11151c;font-size:12px}
 @media(max-width:520px){.chat-panel{right:10px;bottom:70px;width:calc(100vw - 20px);height:70vh}.chat-toggle{right:12px;bottom:12px}}
 
 .analysis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}.analysis-stat{background:#11151c;border:1px solid #303744;border-radius:9px;padding:10px}.analysis-stat small{color:#9da7b5}.analysis-stat b{display:block;font-size:18px;margin-top:5px}.analysis-block{border-top:1px solid #342936;padding:11px 0}.analysis-block h4{margin:0 0 7px}.good{color:#35c98b}.warn{color:#ffd166}.bad{color:#ff716f}.analysis-bar{height:7px;background:#303640;border-radius:99px;overflow:hidden}.analysis-bar span{display:block;height:100%;background:#2d9cdb}.history-edit{padding:6px 9px;font-size:11px}.history-empty{color:#9da7b5;padding:18px}
@@ -45,7 +45,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 </style>
 </head>
 <body>
-<header><h1>🪔 AGARBATTI BUSINESS — AI DASHBOARD</h1><div style="display:flex;align-items:center;gap:10px"><span class="status" id="status">● Cloud sign-in required</span><button id="authBtn" class="secondary" onclick="openAuth()">Sign in</button></div></header>
+<header><h1>🪔 AGARBATTI BUSINESS — AI DASHBOARD</h1><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="status" id="status">● Cloud sign-in required</span><label style="font-size:11px;color:#9da7b5">🎨 Color <select id="themeColor" class="theme-control" onchange="applyThemeColor(this.value)" aria-label="Dashboard color"><option value="#d51b78">Pink</option><option value="#2d9cdb">Blue</option><option value="#35c98b">Green</option><option value="#f59e0b">Orange</option><option value="#8b5cf6">Purple</option><option value="#ef4444">Red</option></select></label><button id="authBtn" class="secondary" onclick="openAuth()">Sign in</button></div></header>
 <div id="authPanel" class="auth-panel hidden">
   <div class="auth-card">
     <button class="secondary auth-close" onclick="closeAuth()">✕</button>
@@ -131,7 +131,9 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 </section>
 </div>
 <script>
-const KEY='aggarbattiBusinessData';const FLAVOUR_KEY='aggarbattiFlavours_v1';
+const KEY='aggarbattiBusinessData';const FLAVOUR_KEY='aggarbattiFlavours_v1';const THEME_KEY='aggarbattiThemeColor_v1';
+function applyThemeColor(color){const allowed=['#d51b78','#2d9cdb','#35c98b','#f59e0b','#8b5cf6','#ef4444'];if(!allowed.includes(color))color=allowed[0];document.documentElement.style.setProperty('--pink',color);document.documentElement.style.setProperty('--cyan',color);const el=document.getElementById('themeColor');if(el)el.value=color;localStorage.setItem(THEME_KEY,color);if(sc||st)render();}
+function initTheme(){applyThemeColor(localStorage.getItem(THEME_KEY)||'#d51b78');}
 const DEFAULT_FLAVOURS=['Rose','Chandan','Mogra','Lavender','Premium Mix'];
 let flavours=JSON.parse(localStorage.getItem(FLAVOUR_KEY)||'null');
 if(!Array.isArray(flavours)||!flavours.length){flavours=[...DEFAULT_FLAVOURS];localStorage.setItem(FLAVOUR_KEY,JSON.stringify(flavours));}
@@ -230,9 +232,9 @@ function render(){data.sort((a,b)=>a.date.localeCompare(b.date));let sales=data.
 document.getElementById('sales').textContent=money(sales);document.getElementById('profit').textContent=money(profit);document.getElementById('units').textContent=units.toLocaleString('en-IN');document.getElementById('orders').textContent=orders.toLocaleString('en-IN');document.getElementById('stock').textContent=stock.toLocaleString('en-IN');
 document.getElementById('rows').innerHTML=data.slice(-12).reverse().map(x=>`<tr><td>${x.date}</td><td>${money(x.sales)}</td><td>${x.orders}</td><td>${x.units}</td><td>${x.production}</td><td>${money(x.expenses)}</td><td>${money(x.profit)}</td><td>${x.stock}</td><td>${x.product}</td></tr>`).join('');
 let labels=data.map(x=>x.date.slice(5)), salesA=data.map(x=>x.sales), profitA=data.map(x=>x.profit), stockA=data.map(x=>x.stock);
-if(sc)sc.destroy();if(st)st.destroy();
-sc=new Chart(document.getElementById('salesChart'),{type:'line',data:{labels,datasets:[{label:'Sales',data:salesA},{label:'Net Profit',data:profitA}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#9da7b5'}},y:{ticks:{color:'#9da7b5'}}}}});
-st=new Chart(document.getElementById('stockChart'),{type:'line',data:{labels,datasets:[{label:'Closing Stock',data:stockA}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#9da7b5'}},y:{ticks:{color:'#9da7b5'}}}}});
+if(sc)sc.destroy();if(st)st.destroy();const accent=getComputedStyle(document.documentElement).getPropertyValue('--pink').trim();
+sc=new Chart(document.getElementById('salesChart'),{type:'line',data:{labels,datasets:[{label:'Sales',data:salesA,borderColor:accent,backgroundColor:accent},{label:'Net Profit',data:profitA,borderColor:'#35c98b',backgroundColor:'#35c98b'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#9da7b5'}},y:{ticks:{color:'#9da7b5'}}}}});
+st=new Chart(document.getElementById('stockChart'),{type:'line',data:{labels,datasets:[{label:'Closing Stock',data:stockA,borderColor:accent,backgroundColor:accent}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#9da7b5'}},y:{ticks:{color:'#9da7b5'}}}}});
 refreshAI();renderHistory()}
 async function addEntry(){let g=id=>document.getElementById(id).value;let sales=+g('fSales')||0,exp=(+g('fRawCost')||0)+(+g('fPack')||0)+(+g('fLabour')||0)+(+g('fOther')||0);let e={date:g('fDate')||new Date().toISOString().slice(0,10),sales,orders:+g('fOrders')||0,units:+g('fUnits')||0,production:+g('fProduction')||0,raw:+g('fRaw')||0,rawCost:+g('fRawCost')||0,pack:+g('fPack')||0,labour:+g('fLabour')||0,other:+g('fOther')||0,expenses:exp,profit:sales-exp,stock:+g('fStock')||0,recv:+g('fRecv')||0,pay:+g('fPay')||0,damaged:+g('fDamaged')||0,product:g('fProduct')};let idx=data.findIndex(x=>x.date===e.date);if(idx>=0)data[idx]=e;else data.push(e);localStorage.setItem(KEY,JSON.stringify(data));render();await saveCloud(e);showTab('dash',document.querySelector('.tab'));alert(cloudReady?'Daily data saved to device + cloud.':'Daily data saved to this device. Connect cloud settings for automatic backup.')}
 function refreshAI(){let el=document.getElementById('insights');if(!el)return;if(!data.length){el.innerHTML='<div class="insight">Add daily data to analyze your business.</div>';return}let d=[...data].sort((a,b)=>a.date.localeCompare(b.date));let last=d[d.length-1],prev=d.slice(-8,-1),avgSales=prev.length?prev.reduce((s,x)=>s+x.sales,0)/prev.length:last.sales;let margin=last.sales?last.profit/last.sales*100:0;let avgUnits=prev.length?prev.reduce((s,x)=>s+x.units,0)/prev.length:last.units;let msgs=[];
@@ -282,7 +284,7 @@ function showTab(id,btn){['dash','entry','history','ai'].forEach(x=>document.get
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='1.1';
+const APP_VERSION='1.2';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking…';
@@ -304,6 +306,6 @@ if('serviceWorker' in navigator){
   window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 
-document.getElementById('fDate').value=new Date().toISOString().slice(0,10);render();initCloudAuth();
+document.getElementById('fDate').value=new Date().toISOString().slice(0,10);initTheme();render();initCloudAuth();
 </script>
 </body></html>
