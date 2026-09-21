@@ -311,22 +311,31 @@ async function saveCloud(e){
 async function initCloudAuth(){
   if(!cloudReady){
     document.getElementById('status').textContent='● Local mode';
+    authInitialized=true; return;
+  }
+  try{
+    const {data:{session}}=await cloud.auth.getSession();
+    if(session){await handleAuthSession(session);return;}
+    const deviceKey='aggarbatti_device_id_v1';
+    const secretKey='aggarbatti_device_secret_v1';
+    let deviceId=localStorage.getItem(deviceKey);
+    let deviceSecret=localStorage.getItem(secretKey);
+    if(!deviceId)deviceId=crypto.randomUUID();
+    if(!deviceSecret){const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);deviceSecret=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');}
+    localStorage.setItem(deviceKey,deviceId);localStorage.setItem(secretKey,deviceSecret);
+    const base=window.SUPABASE_URL.replace(/\/$/,'');
+    const r=await fetch(base+'/functions/v1/device-session',{method:'POST',headers:{'Content-Type':'application/json','apikey':window.SUPABASE_ANON_KEY},body:JSON.stringify({device_id:deviceId,device_secret:deviceSecret})});
+    const body=await r.json();
+    if(!r.ok||body.error)throw new Error(body.error||'Cloud session could not be created.');
+    const set=await cloud.auth.setSession({access_token:body.session.access_token,refresh_token:body.session.refresh_token});
+    if(set.error)throw set.error;
+    await handleAuthSession(set.data.session);
+  }catch(error){
+    console.warn('Cloud connection failed:',error);
+    document.getElementById('status').textContent='● Cloud unavailable — local backup active';
     authInitialized=true;
-    return;
+    await loadParties();
   }
-  const {data:{session}}=await cloud.auth.getSession();
-  if(session){
-    await handleAuthSession(session);
-    return;
-  }
-  const {data,error}=await cloud.auth.signInAnonymously();
-  if(error){
-    console.warn('Anonymous cloud session unavailable:',error);
-    document.getElementById('status').textContent='● Local mode — cloud unavailable';
-    authInitialized=true;
-    return;
-  }
-  await handleAuthSession(data.session);
 }
 async function handleAuthSession(session){
   cloudUser=session?.user||null;
