@@ -562,9 +562,12 @@ function startEditPartyAccount(){
 }
 async function saveEditedParty(){const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p)return;const patch={name:document.getElementById('editPartyName').value.trim(),phone:document.getElementById('editPartyPhone').value.trim(),party_type:document.getElementById('editPartyType').value};if(!patch.name){alert('Enter a name.');return}if(cloudReady&&cloudUser){const q=await cloud.from('parties').update(patch).eq('id',p.id).eq('user_id',cloudUser.id).select().single();if(q.error){alert(q.error.message);return}Object.assign(p,q.data)}else{Object.assign(p,patch);saveLocalPeople()}document.getElementById('khataEditor').classList.add('hidden');renderParties();openPartyLedger(p.id);}
 async function quickPartyAction(kind){
-  const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p)return;const e=document.getElementById('khataEditor');if(!e)return;
-  const isTx=['sale','purchase'].includes(kind),dir=(kind==='received'?'received':'paid'),txType=kind==='purchase'?'buy':'sell';
-  e.classList.remove('hidden');e.innerHTML='<div class="section" style="margin:0 0 8px">'+(kind==='sale'?'You Gave':kind==='received'?'You Got':kind==='purchase'?'Purchase':'Payment Paid')+'</div><div class="formgrid"><div class="field"><label>Amount (₹)</label><input id="quickAmount" type="number" min="0" autofocus></div><div class="field"><label>Date</label><input id="quickDate" type="date" value="'+todayISO()+'"></div><div class="field"><label>Note</label><input id="quickNote" placeholder="Details"></div></div><div class="actions"><button onclick="saveQuickPartyAction(\''+kind+'\')">Save</button><button class="secondary" onclick="document.getElementById('khataEditor').classList.add('hidden')">Cancel</button></div>';
+  const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p)return;
+  const e=document.getElementById('khataEditor');if(!e)return;
+  const title=kind==='sale'?'You Gave':kind==='received'?'You Got':kind==='purchase'?'Purchase':'Payment Paid';
+  e.classList.remove('hidden');
+  e.innerHTML=`<div class="section" style="margin:0 0 8px">${title}</div><div class="formgrid"><div class="field"><label>Amount (₹)</label><input id="quickAmount" type="number" min="0"></div><div class="field"><label>Date</label><input id="quickDate" type="date" value="${todayISO()}"></div><div class="field"><label>Note</label><input id="quickNote" placeholder="Details"></div></div><div class="actions"><button onclick="saveQuickPartyAction('${kind}')">Save</button><button class="secondary" onclick="document.getElementById('khataEditor').classList.add('hidden')">Cancel</button></div>`;
+  document.getElementById('quickAmount')?.focus();
 }
 async function saveQuickPartyAction(kind){
   const id=Number(activeLedgerPartyId),amount=Number(document.getElementById('quickAmount').value)||0;if(amount<=0){alert('Enter amount.');return}
