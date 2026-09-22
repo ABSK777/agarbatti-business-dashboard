@@ -672,6 +672,30 @@ function partyStatementHTML(p){
 @media (prefers-reduced-motion:reduce){
   *{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
+
+/* Scrollable navigation options */
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  flex-wrap:nowrap;
+  white-space:nowrap;
+  scrollbar-width:thin;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:4px;
+}
+.tabs::-webkit-scrollbar{height:6px}
+.tabs::-webkit-scrollbar-thumb{background:#596273;border-radius:20px}
+.tab{flex:0 0 auto;white-space:nowrap}
+@media(max-width:650px){
+  .tabs{
+    gap:5px;
+    padding:7px 7px calc(7px + env(safe-area-inset-bottom));
+    overscroll-behavior-x:contain;
+  }
+  .tab{flex:0 0 auto}
+}
 </style></head><body><h2>Khata — '+escapeHTML(p.name)+'</h2><div>'+escapeHTML(p.phone||'')+'</div><div class="sum"><b>Get: '+money(partyBalance(p).oweMe)+'</b> &nbsp; <b>Give: '+money(partyBalance(p).iOwe)+'</b></div><table><tr><th>Date</th><th>Entry</th><th>Amount</th><th>Due</th><th>Note</th></tr>'+rows.map(x=>'<tr><td>'+escapeHTML(x.date)+'</td><td>'+escapeHTML(x.title)+'</td><td>'+money(x.amount)+'</td><td>'+money(x.due||0)+'</td><td>'+escapeHTML(x.note||'')+'</td></tr>').join('')+'</table></body></html>';
 }
 function printPartyStatement(){const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p)return;const w=window.open('','_blank');if(!w){alert('Please allow pop-ups for printing the Khata statement.');return}w.document.write(partyStatementHTML(p));w.document.close();w.focus();setTimeout(()=>w.print(),250);}
