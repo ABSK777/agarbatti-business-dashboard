@@ -22,6 +22,7 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radius:7px;padding:9px;width:100%}
 .formgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}.actions{display:flex;gap:8px;margin-top:12px}
 .ai{background:linear-gradient(135deg,#191d27,#201527);border:1px solid #4a2340}.insight{padding:10px 0;border-bottom:1px solid #342936;color:#dce2ea}.insight:last-child{border:0}
+.white-theme body{background:#fff;color:#20252b}.white-theme header{background:#fffffff2;border-bottom-color:#e1e5ea}.white-theme .tab{background:#f1f3f5;color:#3d4650}.white-theme .tab.active{background:#2f3742;color:#fff}.white-theme .card,.white-theme .chartbox,.white-theme .tablebox{background:#fff;border-color:#dfe4ea}.white-theme .ai{background:linear-gradient(135deg,#ffffff,#f5f7fa);border-color:#dfe4ea}.white-theme input,.white-theme select{background:#fff;color:#20252b;border-color:#cfd6de}.white-theme button.secondary{background:#eef1f4;color:#25303a}.white-theme th{background:#fff;border-bottom-color:#e1e5ea}.white-theme td{border-bottom-color:#e6e9ed}.white-theme .insight{color:#38424c;border-bottom-color:#e4e8ec}.white-theme .chat-panel{background:#fff;border-color:#d9dee5;box-shadow:0 20px 60px #0002}.white-theme .chat-head{background:#fff;border-bottom-color:#e1e5ea}.white-theme .msg.ai .bubble{background:#f0f3f6;color:#20252b}.white-theme .chat-examples span{border-color:#d5dbe2}.white-theme .theme-control{background:#fff;color:#20252b;border-color:#cfd6de}.white-theme .people-hero{background:linear-gradient(135deg,#ffffff,#f1f4f7);border-color:#dfe4ea}.white-theme .people-summary>div{background:#fff;border-color:#dfe4ea}.white-theme .people-search-card input{background:#fff}.white-theme .flavour-list{background:#fff}
 .hidden{display:none}.status{font-size:12px;color:var(--green)}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.formgrid{grid-template-columns:repeat(2,1fr)}header{padding:14px}.wrap{padding:14px}}
 @media(max-width:520px){.grid{grid-template-columns:1fr 1fr}.formgrid{grid-template-columns:1fr 1fr}.value{font-size:19px}}
@@ -298,8 +299,22 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 </div>
 <script>
 const KEY='aggarbattiBusinessData';const FLAVOUR_KEY='aggarbattiFlavours_v1';const THEME_KEY='aggarbattiThemeColor_v1';
-function applyThemeColor(color){const allowed=['#d51b78','#2d9cdb','#35c98b','#f59e0b','#8b5cf6','#ef4444'];if(!allowed.includes(color))color=allowed[0];document.documentElement.style.setProperty('--pink',color);document.documentElement.style.setProperty('--cyan',color);const el=document.getElementById('themeColor');if(el)el.value=color;localStorage.setItem(THEME_KEY,color);if(sc||st)render();}
-function initTheme(){const v=localStorage.getItem(THEME_KEY)||'#d51b78';applyThemeColor(v);const s=document.getElementById('themeColor');if(s)s.value=v;}
+function applyThemeColor(color){
+  const allowed=['#d51b78','#2d9cdb','#35c98b','#f59e0b','#8b5cf6','#ef4444','#ffffff'];
+  if(!allowed.includes(color))color=allowed[0];
+  const white=color==='#ffffff';
+  document.documentElement.classList.toggle('white-theme',white);
+  document.documentElement.style.setProperty('--pink',white?'#2f3742':color);
+  document.documentElement.style.setProperty('--cyan',white?'#2f3742':color);
+  document.documentElement.style.setProperty('--bg',white?'#ffffff':'#0e1015');
+  document.documentElement.style.setProperty('--panel',white?'#ffffff':'#171b23');
+  document.documentElement.style.setProperty('--text',white?'#20252b':'#f5f7fa');
+  document.documentElement.style.setProperty('--muted',white?'#66717c':'#9da7b5');
+  const el=document.getElementById('themeColor');if(el)el.value=color;
+  localStorage.setItem(THEME_KEY,color);
+  if(sc||st)render();
+}
+function initTheme(){const v=localStorage.getItem(THEME_KEY)||'#d51b78';applyThemeColor(v);}
 const DEFAULT_FLAVOURS=['Rose','Chandan','Mogra','Lavender','Premium Mix'];
 let flavours=JSON.parse(localStorage.getItem(FLAVOUR_KEY)||'null');
 if(!Array.isArray(flavours)||!flavours.length){flavours=[...DEFAULT_FLAVOURS];localStorage.setItem(FLAVOUR_KEY,JSON.stringify(flavours));}
