@@ -184,7 +184,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 .khata-home-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
 .khata-home-title{font-weight:800;margin:18px 2px 8px}.khata-home-person{width:100%;display:flex;align-items:center;gap:10px;padding:12px;margin:6px 0;border:0;border-radius:13px;background:var(--card,#171a21);color:inherit;text-align:left;cursor:pointer}.khp-main{flex:1;min-width:0}.khp-main b,.khp-main small,.khp-bal small{display:block}.khp-main small,.khp-bal small{font-size:10px;opacity:.6}.khp-bal{text-align:right;font-weight:800}.khp-bal.get{color:#36d399}.khp-bal.give{color:#ff6b7a}
 @media(max-width:650px){.khata-home{width:100%}.khata-home-head b{font-size:18px}.khata-home-summary b{font-size:18px}}
-</style></head>
+</style><style>.update-now-btn{font-weight:800;border:1px solid currentColor;padding:8px 12px}</style></head>
 <body>
 <header><h1>🪔 AGARBATTI BUSINESS — AI DASHBOARD</h1><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="status" id="status">● Starting cloud sync…</span><label style="font-size:11px;color:#9da7b5">🎨 Color <select id="themeColor" class="theme-control" onchange="applyThemeColor(this.value)" aria-label="Dashboard color"><option value="#d51b78">Pink</option><option value="#2d9cdb">Blue</option><option value="#35c98b">Green</option><option value="#f59e0b">Orange</option><option value="#8b5cf6">Purple</option><option value="#ef4444">Red</option><option value="#ffffff">White</option></select></label></div></header>
 
@@ -197,7 +197,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><textarea id="chatInput" rows="1" placeholder="Message Agarbatti AI…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 2.6.3</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" data-tab="dash">Dashboard</button><button class="tab" data-tab="entry">Daily Entry</button><button class="tab" data-tab="history">📅 History</button><button class="tab" data-tab="people">👥 People</button><button class="tab" data-tab="khata">📒 Khata Book</button><button class="tab" data-tab="billing">🧾 Billing</button><button class="tab" data-tab="products">📦 Products</button><button class="tab" data-tab="expenses">💰 Expenses</button><button class="tab" data-tab="reports">📊 Reports</button><button class="tab" data-tab="ai">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 2.6.5</span><button class="update-now-btn" onclick="updateNow()">⚡ Update Now</button><button class="secondary" onclick="checkForUpdates()">🔄 Check</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" data-tab="dash">Dashboard</button><button class="tab" data-tab="entry">Daily Entry</button><button class="tab" data-tab="history">📅 History</button><button class="tab" data-tab="people">👥 People</button><button class="tab" data-tab="khata">📒 Khata Book</button><button class="tab" data-tab="billing">🧾 Billing</button><button class="tab" data-tab="products">📦 Products</button><button class="tab" data-tab="expenses">💰 Expenses</button><button class="tab" data-tab="reports">📊 Reports</button><button class="tab" data-tab="ai">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -896,5 +896,25 @@ function renderKhataBookHome(){
   const kg=document.getElementById('khHomeGet'),kp=document.getElementById('khHomeGive');if(kg)kg.textContent=money(get);if(kp)kp.textContent=money(give);
   box.innerHTML=list.length?list.map(p=>{const b=partyBalance(p);const bal=Number(b.oweMe||0)-Number(b.iOwe||0);return '<button class="khata-home-person" onclick="openPartyLedger(\''+p.id+'\')"><span class="person-avatar">'+((p.name||'?')[0].toUpperCase())+'</span><span class="khp-main"><b>'+esc(p.name||'Unnamed')+'</b><small>'+esc(p.phone||'No mobile')+'</small></span><span class="khp-bal '+(bal>=0?'get':'give')+'">'+money(Math.abs(bal))+'<small>'+(bal>=0?'You will get':'You will give')+'</small></span></button>';}).join(''):'<div class="card" style="text-align:center;padding:30px">No people yet.<br><button style="margin-top:12px" onclick="showAddPersonPanelFromKhata()">➕ Add Person</button></div>';
 }
+
+async function updateNow(){
+  const status=document.getElementById('updateStatus');
+  if(status)status.textContent='Updating…';
+  try{
+    if('serviceWorker' in navigator){
+      const reg=await navigator.serviceWorker.getRegistration();
+      if(reg){
+        await reg.update();
+        if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});return;}
+      }
+    }
+    const u=new URL(location.href);
+    u.searchParams.set('update',Date.now());
+    location.replace(u.href);
+  }catch(e){
+    const u=new URL(location.href);u.searchParams.set('update',Date.now());location.replace(u.href);
+  }
+}
+window.addEventListener('load',()=>{setTimeout(()=>checkForUpdates(),1200);});
 </script>
 </body></html>
