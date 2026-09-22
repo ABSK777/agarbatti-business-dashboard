@@ -16,7 +16,7 @@ button.secondary{background:#29303a}.wrap{padding:22px;max-width:1500px;margin:a
 .tabs{display:flex;gap:8px;margin-bottom:18px}.tab{background:#1a1f27;color:#b9c2cf}.tab.active{background:var(--pink);color:white}
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.card{background:var(--panel);border:1px solid #272d37;border-radius:10px;padding:16px}.label{font-size:12px;color:var(--muted);text-transform:uppercase}.value{font-size:25px;font-weight:800;margin-top:8px}
 .blue{color:var(--cyan)}.green{color:var(--green)}.pink{color:#ef4da1}.red{color:#ff716f}
-.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.chartbox{height:330px;background:var(--panel);border:1px solid #272d37;border-radius:10px;padding:14px}.svg-chart{width:100%;height:100%;min-height:280px}.svg-chart svg{width:100%;height:100%;display:block}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.chartbox{height:330px;background:var(--panel);border:1px solid #272d37;border-radius:10px;padding:14px}.chart-title{font-weight:800;font-size:13px;margin:2px 0 8px;color:var(--text)}.biz-chart{display:block;width:100%;height:275px;min-height:275px}
 .section{margin:18px 0 10px;font-weight:800}.tablebox{overflow:auto;background:var(--panel);border-radius:10px;border:1px solid #272d37}
 table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;border-bottom:1px solid #292f39;text-align:left;font-size:13px}th{color:var(--muted);position:sticky;top:0;background:#171b23}
 input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radius:7px;padding:9px;width:100%}
@@ -97,7 +97,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 <div class="card"><div class="label">Orders</div><div class="value pink" id="orders">0</div></div>
 <div class="card"><div class="label">Closing Stock</div><div class="value blue" id="stock">0</div></div>
 </div>
-<div class="charts"><div class="chartbox"><div id="salesChart" class="svg-chart"></div></div><div class="chartbox"><div id="stockChart" class="svg-chart"></div></div></div><div class="card ai" style="margin-top:14px">
+<div class="charts"><div class="chartbox"><div class="chart-title">Sales & Net Profit</div><canvas id="salesChart" class="biz-chart"></canvas></div><div class="chartbox"><div class="chart-title">Closing Stock</div><canvas id="stockChart" class="biz-chart"></canvas></div></div><div class="card ai" style="margin-top:14px">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
     <div><b>🤖 AI Business Assistant</b><div style="color:#9da7b5;font-size:12px;margin-top:4px">Ask your business questions and get instant insights from your dashboard.</div></div>
     <button onclick="toggleChat()">💬 Ask AI</button>
@@ -514,35 +514,20 @@ async function addPartyPayment(){
  document.getElementById('payAmount').value='';document.getElementById('payNotes').value='';renderParties();
 }
 function drawSVGChart(id,labels,series){
-  const box=document.getElementById(id);if(!box)return;
-  const root=getComputedStyle(document.documentElement);
-  const text=root.getPropertyValue('--text').trim()||'#f5f7fa';
-  const muted=root.getPropertyValue('--muted').trim()||'#9da7b5';
-  const accent=root.getPropertyValue('--pink').trim()||'#d51b78';
-  const W=Math.max(520,box.clientWidth||520),H=Math.max(280,box.clientHeight||280),L=56,R=18,T=30,B=40,pw=W-L-R,ph=H-T-B;
-  const vals=series.flatMap(s=>s.data.map(v=>Number(v)||0));
+  const canvas=document.getElementById(id);if(!canvas)return;
+  const dpr=window.devicePixelRatio||1,w=Math.max(300,canvas.clientWidth||600),h=275;
+  canvas.width=w*dpr;canvas.height=h*dpr;canvas.style.height=h+'px';
+  const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+  const cs=getComputedStyle(document.documentElement),txt=cs.getPropertyValue('--text').trim()||'#20252b',muted=cs.getPropertyValue('--muted').trim()||'#66717c',accent=cs.getPropertyValue('--pink').trim()||'#d51b78';
+  const grid=document.documentElement.classList.contains('white-theme')?'#e3e7eb':'#2d333d',colors=[accent,'#35c98b','#2d9cdb','#f59e0b'];
+  const L=55,R=18,T=32,B=42,pw=w-L-R,ph=h-T-B,vals=series.flatMap(s=>s.data.map(v=>Number(v)||0));
   let min=Math.min(0,...vals),max=Math.max(1,...vals);if(max===min)max=min+1;
-  const x=i=>labels.length<2?L+pw/2:L+(i/(labels.length-1))*pw;
-  const y=v=>T+ph-((Number(v)||0)-min)/(max-min)*ph;
-  const esc=s=>String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-  const grid=document.documentElement.classList.contains('white-theme')?'#e2e6eb':'#2d333d';
-  const colors=[accent,'#35c98b','#2d9cdb','#f59e0b'];
-  let svg='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">';
-  for(let g=0;g<=4;g++){
-    const yy=T+(ph*g/4),val=max-(max-min)*g/4;
-    svg+='<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="'+grid+'" stroke-width="1"/>';
-    svg+='<text x="'+(L-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="'+muted+'">'+esc(Math.round(val).toLocaleString('en-IN'))+'</text>';
-  }
-  series.forEach((s,si)=>{
-    const col=colors[si%colors.length];
-    const points=s.data.map((v,i)=>x(i)+','+y(v)).join(' ');
-    svg+='<polyline points="'+points+'" fill="none" stroke="'+col+'" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>';
-    s.data.forEach((v,i)=>svg+='<circle cx="'+x(i)+'" cy="'+y(v)+'" r="3.5" fill="'+col+'"/>');
-  });
-  const every=Math.max(1,Math.ceil(labels.length/6));
-  labels.forEach((lab,i)=>{if(i%every===0||i===labels.length-1)svg+='<text x="'+x(i)+'" y="'+(H-12)+'" text-anchor="middle" font-size="10" fill="'+muted+'">'+esc(lab)+'</text>';});
-  series.forEach((s,i)=>{const lx=L+i*160;svg+='<circle cx="'+lx+'" cy="14" r="4" fill="'+colors[i%colors.length]+'"/><text x="'+(lx+9)+'" y="18" font-size="10" fill="'+text+'">'+esc(s.label)+'</text>';});
-  svg+='</svg>';box.innerHTML=svg;
+  const x=i=>labels.length<2?L+pw/2:L+i/(labels.length-1)*pw,y=v=>T+ph-(Number(v)-min)/(max-min)*ph;
+  ctx.font='10px Arial';ctx.textAlign='right';ctx.lineWidth=1;
+  for(let g=0;g<=4;g++){const yy=T+ph*g/4,val=max-(max-min)*g/4;ctx.strokeStyle=grid;ctx.beginPath();ctx.moveTo(L,yy);ctx.lineTo(w-R,yy);ctx.stroke();ctx.fillStyle=muted;ctx.fillText(Math.round(val).toLocaleString('en-IN'),L-7,yy+4);}
+  series.forEach((s,si)=>{const col=colors[si%colors.length];ctx.strokeStyle=col;ctx.lineWidth=3;ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();s.data.forEach((v,i)=>{const xx=x(i),yy=y(Number(v)||0);i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)});ctx.stroke();s.data.forEach((v,i)=>{ctx.fillStyle=col;ctx.beginPath();ctx.arc(x(i),y(Number(v)||0),4,0,Math.PI*2);ctx.fill()});});
+  ctx.textAlign='center';ctx.fillStyle=muted;const every=Math.max(1,Math.ceil(labels.length/6));labels.forEach((lab,i)=>{if(i%every===0||i===labels.length-1)ctx.fillText(lab,x(i),h-13);});
+  ctx.textAlign='left';series.forEach((s,i)=>{ctx.fillStyle=colors[i%colors.length];ctx.beginPath();ctx.arc(L+i*145,14,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=txt;ctx.fillText(s.label,L+9+i*145,18);});
 }
 const KHATA_THEME_KEY='aggarbattiKhataTheme_v1';
 function applyKhataTheme(v){
@@ -713,7 +698,7 @@ function showTab(id,btn){
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='2.6.0';
+const APP_VERSION='2.6.1';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking…';
