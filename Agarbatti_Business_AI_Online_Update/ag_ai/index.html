@@ -66,7 +66,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 </style>
 </head>
 <body>
-<header><h1>🪔 AGARBATTI BUSINESS — AI DASHBOARD</h1><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="status" id="status">● Starting cloud sync…</span><label style="font-size:11px;color:#9da7b5">🎨 Color <select id="themeColor" class="theme-control" onchange="applyThemeColor(this.value)" aria-label="Dashboard color"><option value="#d51b78">Pink</option><option value="#2d9cdb">Blue</option><option value="#35c98b">Green</option><option value="#f59e0b">Orange</option><option value="#8b5cf6">Purple</option><option value="#ef4444">Red</option></select></label></div></header>
+<header><h1>🪔 AGARBATTI BUSINESS — AI DASHBOARD</h1><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="status" id="status">● Starting cloud sync…</span><label style="font-size:11px;color:#9da7b5">🎨 Color <select id="themeColor" class="theme-control" onchange="applyThemeColor(this.value)" aria-label="Dashboard color"><option value="#d51b78">Pink</option><option value="#2d9cdb">Blue</option><option value="#35c98b">Green</option><option value="#f59e0b">Orange</option><option value="#8b5cf6">Purple</option><option value="#ef4444">Red</option><option value="#ffffff">White</option></select></label></div></header>
 
 </div>
 <button id="chatToggle" class="chat-toggle" onclick="toggleChat()">🤖 Ask AI</button>
@@ -77,7 +77,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><input id="chatInput" placeholder="Type a command…" onkeydown="if(event.key==='Enter')sendChat()"><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 2.1</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 2.5</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('billing',this)">🧾 Billing</button><button class="tab" onclick="showTab('products',this)">📦 Products</button><button class="tab" onclick="showTab('expenses',this)">💰 Expenses</button><button class="tab" onclick="showTab('reports',this)">📊 Reports</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -239,6 +239,50 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 </section>
 
 </section>
+<section id="billing" class="hidden">
+<div class="section">🧾 Billing / Invoice</div>
+<div class="card"><div class="formgrid">
+<div class="field"><label>Invoice Type</label><select id="invType"><option value="sale">Sale Invoice</option><option value="purchase">Purchase Invoice</option></select></div>
+<div class="field"><label>Invoice No.</label><input id="invNo" placeholder="INV-001"></div>
+<div class="field"><label>Date</label><input id="invDate" type="date"></div>
+<div class="field"><label>Customer / Supplier</label><select id="invParty"></select></div>
+<div class="field"><label>Item</label><input id="invItem" placeholder="Agarbatti / Flavour"></div>
+<div class="field"><label>Quantity</label><input id="invQty" type="number" min="0" value="1"></div>
+<div class="field"><label>Rate (₹)</label><input id="invRate" type="number" min="0"></div>
+<div class="field"><label>Discount (₹)</label><input id="invDiscount" type="number" min="0" value="0"></div>
+<div class="field"><label>GST %</label><input id="invTax" type="number" min="0" value="0"></div>
+<div class="field"><label>Paid (₹)</label><input id="invPaid" type="number" min="0" value="0"></div>
+</div><div class="actions"><button onclick="saveInvoice()">💾 Save Invoice</button><button class="secondary" onclick="previewInvoice()">🖨️ Preview / Print</button></div><div id="invoiceResult" class="insight"></div></div>
+<div class="section">Recent Invoices</div><div id="invoiceList" class="tablebox"></div>
+</section>
+<section id="products" class="hidden">
+<div class="section">📦 Products & Inventory</div>
+<div class="card"><div class="formgrid">
+<div class="field"><label>Product / Flavour</label><input id="prodName" placeholder="Rose Agarbatti"></div>
+<div class="field"><label>SKU</label><input id="prodSku"></div>
+<div class="field"><label>Unit</label><select id="prodUnit"><option>piece</option><option>box</option><option>packet</option><option>kg</option></select></div>
+<div class="field"><label>Buy Price</label><input id="prodBuy" type="number" min="0"></div>
+<div class="field"><label>Sell Price</label><input id="prodSell" type="number" min="0"></div>
+<div class="field"><label>Opening Stock</label><input id="prodStock" type="number" min="0"></div>
+<div class="field"><label>Low Stock Alert</label><input id="prodLow" type="number" min="0" value="0"></div>
+<div class="field"><label>GST %</label><input id="prodGst" type="number" min="0" value="0"></div>
+</div><div class="actions"><button onclick="saveProduct()">➕ Add Product</button></div></div>
+<div id="productList" class="tablebox"></div>
+</section>
+<section id="expenses" class="hidden">
+<div class="section">💰 Expenses</div>
+<div class="card"><div class="formgrid">
+<div class="field"><label>Date</label><input id="exDate" type="date"></div>
+<div class="field"><label>Category</label><select id="exCategory"><option>Raw Material</option><option>Packaging</option><option>Labour</option><option>Transport</option><option>Electricity</option><option>Rent</option><option>Marketing</option><option>Repair</option><option>Other</option></select></div>
+<div class="field"><label>Amount (₹)</label><input id="exAmount" type="number" min="0"></div>
+<div class="field"><label>Note</label><input id="exNote"></div>
+</div><div class="actions"><button onclick="saveExpense()">💾 Save Expense</button></div></div><div id="expenseList" class="tablebox"></div>
+</section>
+<section id="reports" class="hidden">
+<div class="section">📊 Business Reports</div>
+<div class="grid"><div class="card"><div class="label">Sales</div><div class="value pink" id="repSales">₹0</div></div><div class="card"><div class="label">Profit</div><div class="value green" id="repProfit">₹0</div></div><div class="card"><div class="label">Receivable</div><div class="value blue" id="repRecv">₹0</div></div><div class="card"><div class="label">Payable</div><div class="value red" id="repPay">₹0</div></div></div>
+<div class="card"><div class="section" style="margin-top:0">📅 Summary</div><div id="reportSummary" class="insight"></div><div class="actions"><button onclick="exportCSV()">⬇️ Export Business CSV</button><button class="secondary" onclick="window.print()">🖨️ Print Report</button></div></div>
+</section>
 <section id="ai" class="hidden">
 <div class="section">🤖 AI Business Assistant</div>
 <div class="card ai"><div class="actions" style="justify-content:space-between;align-items:center"><div><b>📊 Business Health Report</b><div style="color:#9da7b5;font-size:12px">Analyze your latest data, trends, costs, stock and profit.</div></div><select id="analysisPeriod" style="max-width:150px"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="all">All history</option></select><button onclick="analyzeBusinessNow()">🔎 Analyze Business Now</button></div><div id="insights"></div></div>
@@ -255,7 +299,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 <script>
 const KEY='aggarbattiBusinessData';const FLAVOUR_KEY='aggarbattiFlavours_v1';const THEME_KEY='aggarbattiThemeColor_v1';
 function applyThemeColor(color){const allowed=['#d51b78','#2d9cdb','#35c98b','#f59e0b','#8b5cf6','#ef4444'];if(!allowed.includes(color))color=allowed[0];document.documentElement.style.setProperty('--pink',color);document.documentElement.style.setProperty('--cyan',color);const el=document.getElementById('themeColor');if(el)el.value=color;localStorage.setItem(THEME_KEY,color);if(sc||st)render();}
-function initTheme(){applyThemeColor(localStorage.getItem(THEME_KEY)||'#d51b78');}
+function initTheme(){const v=localStorage.getItem(THEME_KEY)||'#d51b78';applyThemeColor(v);const s=document.getElementById('themeColor');if(s)s.value=v;}
 const DEFAULT_FLAVOURS=['Rose','Chandan','Mogra','Lavender','Premium Mix'];
 let flavours=JSON.parse(localStorage.getItem(FLAVOUR_KEY)||'null');
 if(!Array.isArray(flavours)||!flavours.length){flavours=[...DEFAULT_FLAVOURS];localStorage.setItem(FLAVOUR_KEY,JSON.stringify(flavours));}
@@ -446,6 +490,50 @@ async function addPartyPayment(){
  document.getElementById('payAmount').value='';document.getElementById('payNotes').value='';renderParties();
 }
 function todayISO(){return new Date().toISOString().slice(0,10)}
+async function saveProduct(){
+ const name=document.getElementById('prodName').value.trim();if(!name){alert('Enter product name.');return}
+ const payload={name,sku:document.getElementById('prodSku').value.trim(),unit:document.getElementById('prodUnit').value,buy_price:+document.getElementById('prodBuy').value||0,sell_price:+document.getElementById('prodSell').value||0,stock:+document.getElementById('prodStock').value||0,low_stock:+document.getElementById('prodLow').value||0,gst_rate:+document.getElementById('prodGst').value||0};
+ if(cloudReady&&cloudUser){const q=await cloud.from('products').insert({...payload,user_id:cloudUser.id}).select().single();if(q.error){alert(q.error.message);return}}
+ else{const a=JSON.parse(localStorage.getItem('agProducts_v1')||'[]');a.push({...payload,id:Date.now()});localStorage.setItem('agProducts_v1',JSON.stringify(a));}
+ ['prodName','prodSku','prodBuy','prodSell','prodStock'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});loadProducts();
+}
+async function loadProducts(){
+ let rows=[];
+ if(cloudReady&&cloudUser){const q=await cloud.from('products').select('*').eq('user_id',cloudUser.id).order('name');if(!q.error)rows=q.data||[];}
+ else rows=JSON.parse(localStorage.getItem('agProducts_v1')||'[]');
+ const box=document.getElementById('productList');if(!box)return;
+ box.innerHTML='<table><thead><tr><th>Product</th><th>SKU</th><th>Stock</th><th>Buy</th><th>Sell</th><th>Status</th></tr></thead><tbody>'+rows.map(p=>'<tr><td>'+escapeHTML(p.name)+'</td><td>'+escapeHTML(p.sku||'')+'</td><td>'+p.stock+'</td><td>'+money(p.buy_price)+'</td><td>'+money(p.sell_price)+'</td><td>'+(Number(p.stock)<=Number(p.low_stock)?'🔴 Low':'🟢 OK')+'</td></tr>').join('')+'</tbody></table>';
+}
+async function saveExpense(){
+ const amount=+document.getElementById('exAmount').value||0;if(amount<=0){alert('Enter amount.');return}
+ const payload={expense_date:document.getElementById('exDate').value||todayISO(),category:document.getElementById('exCategory').value,amount,notes:document.getElementById('exNote').value.trim()};
+ if(cloudReady&&cloudUser){const q=await cloud.from('expenses').insert({...payload,user_id:cloudUser.id}).select().single();if(q.error){alert(q.error.message);return}}
+ else{const a=JSON.parse(localStorage.getItem('agExpenses_v1')||'[]');a.unshift({...payload,id:Date.now()});localStorage.setItem('agExpenses_v1',JSON.stringify(a));}
+ document.getElementById('exAmount').value='';document.getElementById('exNote').value='';loadExpenses();
+}
+async function loadExpenses(){
+ let rows=[];if(cloudReady&&cloudUser){const q=await cloud.from('expenses').select('*').eq('user_id',cloudUser.id).order('expense_date',{ascending:false}).limit(100);if(!q.error)rows=q.data||[];}else rows=JSON.parse(localStorage.getItem('agExpenses_v1')||'[]');
+ const box=document.getElementById('expenseList');if(!box)return;box.innerHTML='<table><thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Note</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+x.expense_date+'</td><td>'+escapeHTML(x.category)+'</td><td>'+money(x.amount)+'</td><td>'+escapeHTML(x.notes||'')+'</td></tr>').join('')+'</tbody></table>';
+}
+async function saveInvoice(){
+ const item=document.getElementById('invItem').value.trim(),qty=+document.getElementById('invQty').value||0,rate=+document.getElementById('invRate').value||0;if(!item||qty<=0||rate<0){alert('Enter item, quantity and rate.');return}
+ const subtotal=qty*rate,discount=+document.getElementById('invDiscount').value||0,taxRate=+document.getElementById('invTax').value||0,tax=Math.max(0,(subtotal-discount)*taxRate/100),total=Math.max(0,subtotal-discount+tax),paid=Math.min(total,+document.getElementById('invPaid').value||0);
+ const payload={invoice_no:document.getElementById('invNo').value.trim()||('INV-'+Date.now()),invoice_date:document.getElementById('invDate').value||todayISO(),invoice_type:document.getElementById('invType').value,party_id:+document.getElementById('invParty').value||null,subtotal,discount,tax,total,paid,tax_mode:taxRate?'gst':'none',notes:item};
+ if(cloudReady&&cloudUser){const q=await cloud.from('invoices').insert({...payload,user_id:cloudUser.id}).select().single();if(q.error){alert(q.error.message);return}await cloud.from('invoice_items').insert({user_id:cloudUser.id,invoice_id:q.data.id,description:item,qty,unit_price:rate,tax_rate:taxRate,line_total:total});}
+ else{const a=JSON.parse(localStorage.getItem('agInvoices_v1')||'[]');a.unshift({...payload,id:Date.now(),due:total-paid,item,qty,rate});localStorage.setItem('agInvoices_v1',JSON.stringify(a));}
+ document.getElementById('invoiceResult').textContent='Invoice saved: '+payload.invoice_no+' • Total '+money(total)+' • Due '+money(total-paid);loadInvoices();
+}
+async function loadInvoices(){
+ let rows=[];if(cloudReady&&cloudUser){const q=await cloud.from('invoices').select('*,parties(name)').eq('user_id',cloudUser.id).order('invoice_date',{ascending:false}).limit(100);if(!q.error)rows=q.data||[];}else rows=JSON.parse(localStorage.getItem('agInvoices_v1')||'[]');
+ const box=document.getElementById('invoiceList');if(!box)return;box.innerHTML='<table><thead><tr><th>Date</th><th>Invoice</th><th>Party</th><th>Total</th><th>Paid</th><th>Due</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+x.invoice_date+'</td><td>'+escapeHTML(x.invoice_no)+'</td><td>'+escapeHTML(x.parties?.name||x.item||'Cash Sale')+'</td><td>'+money(x.total)+'</td><td>'+money(x.paid)+'</td><td>'+money(x.due||((+x.total||0)-(+x.paid||0)))+'</td></tr>').join('')+'</tbody></table>';
+}
+function previewInvoice(){alert('Use the browser Print command after opening Billing. A printable invoice layout will be added next.');}
+function renderBusinessReports(){
+ const sales=data.reduce((s,x)=>s+(+x.sales||0),0),profit=data.reduce((s,x)=>s+(+x.profit||0),0),recv=data.reduce((s,x)=>s+(+x.recv||0),0),pay=data.reduce((s,x)=>s+(+x.pay||0),0);
+ document.getElementById('repSales').textContent=money(sales);document.getElementById('repProfit').textContent=money(profit);document.getElementById('repRecv').textContent=money(recv);document.getElementById('repPay').textContent=money(pay);
+ document.getElementById('reportSummary').textContent='Business summary from your saved daily records: '+data.length+' days recorded. Use People for individual khata balances, Billing for invoices, Products for stock, and Expenses for expense categories.';
+ loadProducts();loadExpenses();loadInvoices();
+}
 function todayEntry(){let t=new Date().toISOString().slice(0,10);return data.find(x=>x.date===t)||null}
 function commandResponse(raw){let q=raw.toLowerCase().trim();let t=new Date().toISOString().slice(0,10);let e=todayEntry();
  if(q.includes('analyze')||q.includes('analysis')||q.includes('business report')){refreshAI();let el=document.getElementById('insights');let txt=[...el.querySelectorAll('.insight')].map(x=>x.innerText).join('\n');return 'Business analysis:\n'+txt}
@@ -476,11 +564,18 @@ function editEntry(date){let x=data.find(e=>e.date===date);if(!x)return;let map=
 function analyzeBusinessNow(){let el=document.getElementById('insights');if(!el)return;if(!data.length){el.innerHTML='<div class="insight">📝 No entries yet. Add your first Daily Entry, then press Analyze Business Now.</div>';return}let period=document.getElementById('analysisPeriod')?.value||'30';let d=[...data].sort((a,b)=>a.date.localeCompare(b.date));if(period!=='all'){let n=Number(period);d=d.slice(-n)}let sales=d.reduce((s,x)=>s+Number(x.sales||0),0),exp=d.reduce((s,x)=>s+Number(x.expenses||0),0),profit=d.reduce((s,x)=>s+Number(x.profit||0),0),units=d.reduce((s,x)=>s+Number(x.units||0),0),orders=d.reduce((s,x)=>s+Number(x.orders||0),0),prod=d.reduce((s,x)=>s+Number(x.production||0),0),dam=d.reduce((s,x)=>s+Number(x.damaged||0),0);let margin=sales?profit/sales*100:0;let last=d[d.length-1],prev=d.length>1?d[d.length-2]:null;let change=prev&&prev.sales?((last.sales-prev.sales)/prev.sales*100):null;let productMap={};d.forEach(x=>{let p=x.product||'Unknown';productMap[p]=(productMap[p]||0)+Number(x.sales||0)});let top=Object.entries(productMap).sort((a,b)=>b[1]-a[1])[0];let warnings=[];if(margin<15)warnings.push('<span class="bad">⚠ Profit margin is below 15% — review raw-material, labour and packaging costs.</span>');else warnings.push('<span class="good">✓ Profit margin is '+margin.toFixed(1)+'%.</span>');if(exp>sales*.7)warnings.push('<span class="warn">⚠ Expenses are above 70% of sales.</span>');if(last.stock<3000)warnings.push('<span class="warn">⚠ Latest stock is below 3,000 units.</span>');if(dam>units*.03)warnings.push('<span class="warn">⚠ Damaged/rejected units are above 3% of units sold.</span>');if(prod>units*1.2)warnings.push('📦 Production is considerably higher than sales — stock may be building.');if(units>prod*1.2)warnings.push('📦 Sales are considerably higher than production — monitor stock availability.');let advice=[];if(change!==null)advice.push((change>=0?'📈':'📉')+' Latest sales changed '+Math.abs(change).toFixed(1)+'% '+(change>=0?'up':'down')+' versus the previous recorded day.');if(top)advice.push('🏷 Top recorded product by sales value: '+escapeHTML(top[0])+' ('+money(top[1])+').');advice.push('🛒 Use the latest stock and sales trend before planning tomorrow’s production.');el.innerHTML='<div class="analysis-grid"><div class="analysis-stat"><small>Period Sales</small><b>'+money(sales)+'</b></div><div class="analysis-stat"><small>Expenses</small><b>'+money(exp)+'</b></div><div class="analysis-stat"><small>Profit</small><b class="'+(profit>=0?'good':'bad')+'">'+money(profit)+'</b></div><div class="analysis-stat"><small>Profit Margin</small><b>'+margin.toFixed(1)+'%</b></div></div><div class="analysis-block"><h4>📌 Business health</h4>'+warnings.map(x=>'<div class="insight">'+x+'</div>').join('')+'</div><div class="analysis-block"><h4>📈 Trends & activity</h4><div class="insight">'+d.length+' day(s) analyzed • '+orders.toLocaleString('en-IN')+' orders • '+units.toLocaleString('en-IN')+' units sold • '+prod.toLocaleString('en-IN')+' produced.</div>'+advice.map(x=>'<div class="insight">'+x+'</div>').join('')+'</div><div class="analysis-block"><h4>💡 Recommended next actions</h4><div class="insight">1. Keep daily entries updated so the trend becomes more accurate.</div><div class="insight">2. Check the largest expense category before changing prices.</div><div class="insight">3. Review stock against the latest sales pace before production.</div></div><div class="analysis-block"><small>Analysis is based only on the saved entries in this dashboard.</small></div>'}
 function exportCSV(){let h=['Date','Sales','Orders','Units','Production','Raw Material kg','Raw Purchase','Packaging','Labour','Other Expenses','Total Expenses','Net Profit','Stock','Receivable','Payable','Damaged','Top Product'];let rows=data.map(x=>[x.date,x.sales,x.orders,x.units,x.production,x.raw,x.rawCost,x.pack,x.labour,x.other,x.expenses,x.profit,x.stock,x.recv,x.pay,x.damaged,x.product]);let csv=[h,...rows].map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='aggarbatti-business-data.csv';a.click()}
 function resetData(){if(confirm('Reset to demo data?')){data=demo();localStorage.setItem(KEY,JSON.stringify(data));render()}}
-function showTab(id,btn){['dash','entry','history','ai'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==id)); if(id==='history')renderHistory();document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active')}
+function showTab(id,btn){
+  ['dash','entry','history','people','ai','billing','products','expenses','reports'].forEach(x=>{const e=document.getElementById(x);if(e)e.classList.toggle('hidden',x!==id);});
+  if(id==='history')renderHistory();
+  if(id==='people')loadParties();
+  if(id==='reports')renderBusinessReports();
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+}
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='2.1';
+const APP_VERSION='2.5';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking…';
@@ -502,6 +597,6 @@ if('serviceWorker' in navigator){
   window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 
-document.getElementById('fDate').value=new Date().toISOString().slice(0,10);document.getElementById('txDate').value=new Date().toISOString().slice(0,10);document.getElementById('payDate').value=new Date().toISOString().slice(0,10);initTheme();render();initCloudAuth();
+document.getElementById('fDate').value=new Date().toISOString().slice(0,10);document.getElementById('invDate').value=new Date().toISOString().slice(0,10);document.getElementById('exDate').value=new Date().toISOString().slice(0,10);document.getElementById('txDate').value=new Date().toISOString().slice(0,10);document.getElementById('payDate').value=new Date().toISOString().slice(0,10);initTheme();render();initCloudAuth();
 </script>
 </body></html>
