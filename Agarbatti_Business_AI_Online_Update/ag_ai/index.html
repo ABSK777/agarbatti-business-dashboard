@@ -74,11 +74,11 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 <div id="chatPanel" class="chat-panel hidden">
   <div class="chat-head"><div><b>🤖 Agarbatti AI</b><br><small>Ask questions or give business commands</small></div><button class="secondary" onclick="toggleChat()">✕</button></div>
   <div id="chatBody" class="chat-body"></div>
-  <div class="chat-examples"><b>Try:</b><br><span onclick="useExample('show today sales')">today sales</span><span onclick="useExample('show profit')">profit</span><span onclick="useExample('add sale 15000')">add sale ₹15,000</span><span onclick="useExample('update stock 25000')">update stock</span><span onclick="useExample('analyze business')">analyze business</span></div>
-  <div class="chat-input"><input id="chatInput" placeholder="Type a command…" onkeydown="if(event.key==='Enter')sendChat()"><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
+  <div class="chat-examples"><b>Try:</b><br><span onclick="useExample('How is my business doing today?')">business today</span><span onclick="useExample('Analyze my profit and expenses')">profit analysis</span><span onclick="useExample('What is my current stock and what should I produce next?')">stock advice</span><span onclick="useExample('Show my customer and supplier dues')">Khata dues</span></div>
+  <div class="chat-input"><textarea id="chatInput" rows="1" placeholder="Message Agarbatti AI…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 2.5.2</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('billing',this)">🧾 Billing</button><button class="tab" onclick="showTab('products',this)">📦 Products</button><button class="tab" onclick="showTab('expenses',this)">💰 Expenses</button><button class="tab" onclick="showTab('reports',this)">📊 Reports</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 2.5.4</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('billing',this)">🧾 Billing</button><button class="tab" onclick="showTab('products',this)">📦 Products</button><button class="tab" onclick="showTab('expenses',this)">💰 Expenses</button><button class="tab" onclick="showTab('reports',this)">📊 Reports</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -563,7 +563,19 @@ function commandResponse(raw){let q=raw.toLowerCase().trim();let t=new Date().to
  if(q.includes('daily entry')||q.includes('entry')){showTab('entry',document.querySelectorAll('.tab')[1]);return 'Daily Entry opened.'}
  if(q==='help'||q.includes('what can you do'))return 'I can:\n• Show today sales, profit and stock\n• Show total sales\n• Add/update a sale amount\n• Update today stock\n• Open Dashboard or Daily Entry\n• Analyze the business\nFor full natural-language AI, connect an AI backend/API securely.'
  return null}
-async function sendChat(){let input=document.getElementById('chatInput');let q=input.value.trim();if(!q)return;addChat('user',q);input.value='';let answer=commandResponse(q);if(answer!==null){addChat('ai',answer);return}addChat('ai','Thinking…');try{let r=await askRealAI(q);let msgs=document.querySelectorAll('#chatBody .msg.ai .bubble');if(msgs.length)msgs[msgs.length-1].innerHTML=escapeHTML(r).replace(/\n/g,'<br>')}catch(err){let msgs=document.querySelectorAll('#chatBody .msg.ai .bubble');if(msgs.length)msgs[msgs.length-1].innerHTML='AI connection failed: '+escapeHTML(err.message)+'<br><small>Check your Supabase Edge Function and OpenAI API secret.</small>'}}
+async function chatHistory(){try{return JSON.parse(localStorage.getItem('aggarbattiAIChat_v1')||'[]')}catch(e){return []}}
+function saveChatHistory(){try{localStorage.setItem('aggarbattiAIChat_v1',JSON.stringify([...document.querySelectorAll('#chatBody .msg')].slice(-50).map(m=>({who:m.classList.contains('user')?'user':'ai',text:m.querySelector('.bubble')?.innerText||''}))))}catch(e){}}
+function sendChat(){
+  const input=document.getElementById('chatInput');const q=input.value.trim();if(!q)return;
+  addChat('user',q);input.value='';input.style.height='auto';addChat('ai','Thinking…');
+  askRealAI(q).then(r=>{
+    const msgs=document.querySelectorAll('#chatBody .msg.ai .bubble');if(msgs.length)msgs[msgs.length-1].innerHTML=escapeHTML(r).replace(/\n/g,'<br>');
+    saveChatHistory();
+  }).catch(err=>{
+    const msgs=document.querySelectorAll('#chatBody .msg.ai .bubble');if(msgs.length)msgs[msgs.length-1].innerHTML='☁️ Cloud AI error: '+escapeHTML(err.message)+'<br><small>Your local data is still safe.</small>';
+    saveChatHistory();
+  });
+}
 function escapeHTML(s){return String(s).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]))}
 async function askRealAI(message){
   if(!cloudReady)throw new Error('Connect Supabase first.');
