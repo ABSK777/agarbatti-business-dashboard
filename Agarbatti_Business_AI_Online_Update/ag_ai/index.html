@@ -97,6 +97,84 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   .tab{flex:0 0 auto}
 }
 
+/* Mobile-first dashboard layout */
+@media (max-width:650px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  body{font-size:14px;padding-bottom:74px}
+  header{position:sticky;top:0;padding:10px 12px;min-height:58px;gap:8px;align-items:flex-start;z-index:40}
+  header h1{font-size:14px;line-height:1.25;max-width:58%;padding-top:3px}
+  header>div{gap:6px!important;justify-content:flex-end}
+  header .status{font-size:10px;max-width:110px;text-align:right;line-height:1.2}
+  header label{font-size:10px!important}
+  .theme-control{min-width:92px!important;padding:7px 8px!important;font-size:11px!important}
+  .wrap{padding:10px 10px 0;max-width:none}
+  .tabs{position:fixed;left:0;right:0;bottom:0;margin:0;padding:7px 7px calc(7px + env(safe-area-inset-bottom));background:rgba(14,16,21,.97);border-top:1px solid #2d333d;z-index:60;display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;box-shadow:0 -8px 28px #0007}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:0 0 auto;min-width:82px;min-height:48px;padding:8px 9px;border-radius:11px;font-size:11px;line-height:1.1;white-space:nowrap}
+  .grid{grid-template-columns:1fr 1fr;gap:8px}
+  .card{padding:12px;border-radius:12px;min-width:0}
+  .label{font-size:9px;letter-spacing:.2px}
+  .value{font-size:20px;margin-top:5px;word-break:break-word}
+  .charts{grid-template-columns:1fr;gap:10px;margin-top:10px}
+  .chartbox{height:285px;padding:11px;border-radius:12px}
+  .biz-chart{height:220px;min-height:220px}
+  .section{margin:14px 0 8px}
+  .formgrid{grid-template-columns:1fr;gap:9px}
+  .field label{font-size:10px}
+  input,select{min-height:44px;padding:10px;font-size:14px}
+  textarea{font-size:14px;min-height:90px}
+  button{min-height:44px;padding:10px 12px;border-radius:10px}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .tablebox{border-radius:12px;-webkit-overflow-scrolling:touch}
+  table{min-width:760px}
+  th,td{padding:9px 8px;font-size:12px}
+  .top-update{margin:4px 0 8px;font-size:10px}
+  .top-update #updateStatus{min-width:0;flex:1}
+  .top-update button{min-height:38px}
+  .analysis-grid{grid-template-columns:1fr 1fr;gap:7px}
+  .analysis-stat{padding:9px}
+  .analysis-stat b{font-size:16px}
+  .people-hero{padding:12px;border-radius:12px}
+  .people-hero b{font-size:17px}
+  .people-summary{grid-template-columns:1fr 1fr 1fr;gap:5px}
+  .people-summary>div{padding:8px;min-width:0}
+  .people-summary b{font-size:13px;word-break:break-word}
+  .people-summary span{font-size:7px}
+  .person-form{display:grid;grid-template-columns:1fr;gap:9px}
+  .person-avatar-preview{margin:0 auto}
+  .person-fields{grid-template-columns:1fr;gap:8px}
+  .person-card{padding:10px;border-radius:12px}
+  .person-avatar{width:40px;height:40px}
+  .person-name{font-size:13px}
+  .person-bal b{font-size:13px}
+  .khata-phone{width:100vw;height:100dvh}
+  .kb-topbar{padding:8px 9px}
+  .kb-entry-actions{gap:8px;padding:10px}
+  .kb-entry-actions button{min-height:60px;padding:10px}
+  .kb-tabs{padding-left:10px;padding-right:10px}
+  .kb-date-filters{grid-template-columns:1fr}
+  .kb-date-filters .field:last-child{grid-column:auto}
+  .kb-txn{padding:11px 10px}
+  .kb-bottom-actions{grid-template-columns:1fr 1fr;padding:8px 10px}
+  .kb-more-actions{padding-left:10px;padding-right:10px}
+  .chat-toggle{right:12px;bottom:82px;min-height:48px;padding:12px 15px}
+  .chat-panel{right:6px;bottom:76px;width:calc(100vw - 12px);height:calc(100dvh - 94px);max-height:none;border-radius:16px}
+  .chat-input{padding:8px}
+  .chat-input textarea,.chat-input input{min-height:46px}
+  .chat-examples{padding-bottom:6px}
+}
+@media (max-width:390px){
+  header h1{max-width:52%;font-size:12px}
+  header .status{display:none}
+  .value{font-size:18px}
+  .tab{min-width:76px;font-size:10px;padding-left:7px;padding-right:7px}
+  .people-summary b{font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
+
+
 </style>
 </head>
 <body>
@@ -619,85 +697,7 @@ async function sharePartyStatement(){
 }
 function partyStatementHTML(p){
   const rows=[...partyTransactions.filter(x=>Number(x.party_id)===Number(p.id)).map(x=>({date:x.txn_date,title:x.txn_type==='sell'?'You Gave':'Purchase',amount:x.amount,due:x.due,note:x.notes})),...partyPayments.filter(x=>Number(x.party_id)===Number(p.id)).map(x=>({date:x.payment_date,title:x.direction==='received'?'You Got':'Payment Paid',amount:x.amount,due:0,note:x.notes}))].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-  return '<html><head><title>Khata - '+escapeHTML(p.name)+'</title><style>body{font-family:Arial;padding:25px}h2{margin-bottom:4px}.sum{padding:14px;background:#f3f5f7;border-radius:10px;margin:12px 0}table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #ddd;text-align:left}
-/* Mobile-first dashboard layout */
-@media (max-width:650px){
-  html,body{width:100%;max-width:100%;overflow-x:hidden}
-  body{font-size:14px;padding-bottom:74px}
-  header{position:sticky;top:0;padding:10px 12px;min-height:58px;gap:8px;align-items:flex-start;z-index:40}
-  header h1{font-size:14px;line-height:1.25;max-width:58%;padding-top:3px}
-  header>div{gap:6px!important;justify-content:flex-end}
-  header .status{font-size:10px;max-width:110px;text-align:right;line-height:1.2}
-  header label{font-size:10px!important}
-  .theme-control{min-width:92px!important;padding:7px 8px!important;font-size:11px!important}
-  .wrap{padding:10px 10px 0;max-width:none}
-  .tabs{position:fixed;left:0;right:0;bottom:0;margin:0;padding:7px 7px calc(7px + env(safe-area-inset-bottom));background:rgba(14,16,21,.97);border-top:1px solid #2d333d;z-index:60;display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;box-shadow:0 -8px 28px #0007}
-  .tabs::-webkit-scrollbar{display:none}
-  .tab{flex:0 0 auto;min-width:82px;min-height:48px;padding:8px 9px;border-radius:11px;font-size:11px;line-height:1.1;white-space:nowrap}
-  .grid{grid-template-columns:1fr 1fr;gap:8px}
-  .card{padding:12px;border-radius:12px;min-width:0}
-  .label{font-size:9px;letter-spacing:.2px}
-  .value{font-size:20px;margin-top:5px;word-break:break-word}
-  .charts{grid-template-columns:1fr;gap:10px;margin-top:10px}
-  .chartbox{height:285px;padding:11px;border-radius:12px}
-  .biz-chart{height:220px;min-height:220px}
-  .section{margin:14px 0 8px}
-  .formgrid{grid-template-columns:1fr;gap:9px}
-  .field label{font-size:10px}
-  input,select{min-height:44px;padding:10px;font-size:14px}
-  textarea{font-size:14px;min-height:90px}
-  button{min-height:44px;padding:10px 12px;border-radius:10px}
-  .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .tablebox{border-radius:12px;-webkit-overflow-scrolling:touch}
-  table{min-width:760px}
-  th,td{padding:9px 8px;font-size:12px}
-  .top-update{margin:4px 0 8px;font-size:10px}
-  .top-update #updateStatus{min-width:0;flex:1}
-  .top-update button{min-height:38px}
-  .analysis-grid{grid-template-columns:1fr 1fr;gap:7px}
-  .analysis-stat{padding:9px}
-  .analysis-stat b{font-size:16px}
-  .people-hero{padding:12px;border-radius:12px}
-  .people-hero b{font-size:17px}
-  .people-summary{grid-template-columns:1fr 1fr 1fr;gap:5px}
-  .people-summary>div{padding:8px;min-width:0}
-  .people-summary b{font-size:13px;word-break:break-word}
-  .people-summary span{font-size:7px}
-  .person-form{display:grid;grid-template-columns:1fr;gap:9px}
-  .person-avatar-preview{margin:0 auto}
-  .person-fields{grid-template-columns:1fr;gap:8px}
-  .person-card{padding:10px;border-radius:12px}
-  .person-avatar{width:40px;height:40px}
-  .person-name{font-size:13px}
-  .person-bal b{font-size:13px}
-  .khata-phone{width:100vw;height:100dvh}
-  .kb-topbar{padding:8px 9px}
-  .kb-entry-actions{gap:8px;padding:10px}
-  .kb-entry-actions button{min-height:60px;padding:10px}
-  .kb-tabs{padding-left:10px;padding-right:10px}
-  .kb-date-filters{grid-template-columns:1fr}
-  .kb-date-filters .field:last-child{grid-column:auto}
-  .kb-txn{padding:11px 10px}
-  .kb-bottom-actions{grid-template-columns:1fr 1fr;padding:8px 10px}
-  .kb-more-actions{padding-left:10px;padding-right:10px}
-  .chat-toggle{right:12px;bottom:82px;min-height:48px;padding:12px 15px}
-  .chat-panel{right:6px;bottom:76px;width:calc(100vw - 12px);height:calc(100dvh - 94px);max-height:none;border-radius:16px}
-  .chat-input{padding:8px}
-  .chat-input textarea,.chat-input input{min-height:46px}
-  .chat-examples{padding-bottom:6px}
-}
-@media (max-width:390px){
-  header h1{max-width:52%;font-size:12px}
-  header .status{display:none}
-  .value{font-size:18px}
-  .tab{min-width:76px;font-size:10px;padding-left:7px;padding-right:7px}
-  .people-summary b{font-size:12px}
-}
-@media (prefers-reduced-motion:reduce){
-  *{scroll-behavior:auto!important;transition:none!important;animation:none!important}
-}
-
-</head><body><h2>Khata — '+escapeHTML(p.name)+'</h2><div>'+escapeHTML(p.phone||'')+'</div><div class="sum"><b>Get: '+money(partyBalance(p).oweMe)+'</b> &nbsp; <b>Give: '+money(partyBalance(p).iOwe)+'</b></div><table><tr><th>Date</th><th>Entry</th><th>Amount</th><th>Due</th><th>Note</th></tr>'+rows.map(x=>'<tr><td>'+escapeHTML(x.date)+'</td><td>'+escapeHTML(x.title)+'</td><td>'+money(x.amount)+'</td><td>'+money(x.due||0)+'</td><td>'+escapeHTML(x.note||'')+'</td></tr>').join('')+'</table></body></html>';
+  return '<html><head><title>Khata - '+escapeHTML(p.name)+'</title><style>body{font-family:Arial;padding:25px}h2{margin-bottom:4px}.sum{padding:14px;background:#f3f5f7;border-radius:10px;margin:12px 0}table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #ddd;text-align:left}</style></head><body><h2>Khata — '+escapeHTML(p.name)+'</h2><div>'+escapeHTML(p.phone||'')+'</div><div class="sum"><b>Get: '+money(partyBalance(p).oweMe)+'</b> &nbsp; <b>Give: '+money(partyBalance(p).iOwe)+'</b></div><table><tr><th>Date</th><th>Entry</th><th>Amount</th><th>Due</th><th>Note</th></tr>'+rows.map(x=>'<tr><td>'+escapeHTML(x.date)+'</td><td>'+escapeHTML(x.title)+'</td><td>'+money(x.amount)+'</td><td>'+money(x.due||0)+'</td><td>'+escapeHTML(x.note||'')+'</td></tr>').join('')+'</table></body></html>';
 }
 function printPartyStatement(){const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p)return;const w=window.open('','_blank');if(!w){alert('Please allow pop-ups for printing the Khata statement.');return}w.document.write(partyStatementHTML(p));w.document.close();w.focus();setTimeout(()=>w.print(),250);}
 function exportPartyStatement(){const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p)return;const rows=[['Date','Entry','Amount','Due','Note'],...partyTransactions.filter(x=>Number(x.party_id)===Number(p.id)).map(x=>[x.txn_date,x.txn_type==='sell'?'You Gave':'Purchase',x.amount,x.due,x.notes||'']),...partyPayments.filter(x=>Number(x.party_id)===Number(p.id)).map(x=>[x.payment_date,x.direction==='received'?'You Got':'Payment Paid',x.amount,0,x.notes||''])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='khata-'+p.name.replace(/[^a-z0-9-_]+/gi,'-').toLowerCase()+'.csv';a.click();}
