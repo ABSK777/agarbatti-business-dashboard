@@ -16,7 +16,7 @@ button.secondary{background:#29303a}.wrap{padding:22px;max-width:1500px;margin:a
 .tabs{display:flex;gap:8px;margin-bottom:18px}.tab{background:#1a1f27;color:#b9c2cf}.tab.active{background:var(--pink);color:white}
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.card{background:var(--panel);border:1px solid #272d37;border-radius:10px;padding:16px}.label{font-size:12px;color:var(--muted);text-transform:uppercase}.value{font-size:25px;font-weight:800;margin-top:8px}
 .blue{color:var(--cyan)}.green{color:var(--green)}.pink{color:#ef4da1}.red{color:#ff716f}
-.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.chartbox{height:330px;background:var(--panel);border:1px solid #272d37;border-radius:10px;padding:14px}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.chartbox{height:330px;background:var(--panel);border:1px solid #272d37;border-radius:10px;padding:14px}.svg-chart{width:100%;height:100%;min-height:280px}.svg-chart svg{width:100%;height:100%;display:block}
 .section{margin:18px 0 10px;font-weight:800}.tablebox{overflow:auto;background:var(--panel);border-radius:10px;border:1px solid #272d37}
 table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;border-bottom:1px solid #292f39;text-align:left;font-size:13px}th{color:var(--muted);position:sticky;top:0;background:#171b23}
 input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radius:7px;padding:9px;width:100%}
@@ -78,7 +78,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><textarea id="chatInput" rows="1" placeholder="Message Agarbatti AI…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 2.5.5</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('billing',this)">🧾 Billing</button><button class="tab" onclick="showTab('products',this)">📦 Products</button><button class="tab" onclick="showTab('expenses',this)">💰 Expenses</button><button class="tab" onclick="showTab('reports',this)">📊 Reports</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 2.5.5</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('people',this)">📒 Khata Book</button><button class="tab" onclick="showTab('billing',this)">🧾 Billing</button><button class="tab" onclick="showTab('products',this)">📦 Products</button><button class="tab" onclick="showTab('expenses',this)">💰 Expenses</button><button class="tab" onclick="showTab('reports',this)">📊 Reports</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -88,7 +88,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 <div class="card"><div class="label">Orders</div><div class="value pink" id="orders">0</div></div>
 <div class="card"><div class="label">Closing Stock</div><div class="value blue" id="stock">0</div></div>
 </div>
-<div class="charts"><div class="chartbox"><canvas id="salesChart"></canvas></div><div class="chartbox"><canvas id="stockChart"></canvas></div></div><div class="card ai" style="margin-top:14px">
+<div class="charts"><div class="chartbox"><div id="salesChart" class="svg-chart"></div></div><div class="chartbox"><div id="stockChart" class="svg-chart"></div></div></div><div class="card ai" style="margin-top:14px">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
     <div><b>🤖 AI Business Assistant</b><div style="color:#9da7b5;font-size:12px;margin-top:4px">Ask your business questions and get instant insights from your dashboard.</div></div>
     <button onclick="toggleChat()">💬 Ask AI</button>
@@ -414,16 +414,8 @@ function render(){data.sort((a,b)=>a.date.localeCompare(b.date));let sales=data.
 document.getElementById('sales').textContent=money(sales);document.getElementById('profit').textContent=money(profit);document.getElementById('units').textContent=units.toLocaleString('en-IN');document.getElementById('orders').textContent=orders.toLocaleString('en-IN');document.getElementById('stock').textContent=stock.toLocaleString('en-IN');
 document.getElementById('rows').innerHTML=data.slice(-12).reverse().map(x=>`<tr><td>${x.date}</td><td>${money(x.sales)}</td><td>${x.orders}</td><td>${x.units}</td><td>${x.production}</td><td>${money(x.expenses)}</td><td>${money(x.profit)}</td><td>${x.stock}</td><td>${x.product}</td></tr>`).join('');
 let labels=data.map(x=>x.date.slice(5)), salesA=data.map(x=>Number(x.sales||0)), profitA=data.map(x=>Number(x.profit||0)), stockA=data.map(x=>Number(x.stock||0));
-if(sc)sc.destroy();if(st)st.destroy();
-const root=getComputedStyle(document.documentElement),accent=root.getPropertyValue('--pink').trim()||'#d51b78',muted=root.getPropertyValue('--muted').trim()||'#9da7b5',text=root.getPropertyValue('--text').trim()||'#f5f7fa',grid=document.documentElement.classList.contains('white-theme')?'#dfe4ea':'#292f39';
-const salesCanvas=document.getElementById('salesChart'),stockCanvas=document.getElementById('stockChart');
-if(typeof Chart==='function'&&salesCanvas&&stockCanvas){
-sc=new Chart(salesCanvas,{type:'line',data:{labels,datasets:[{label:'Sales',data:salesA,borderColor:accent,backgroundColor:'transparent',tension:.3,pointRadius:3},{label:'Net Profit',data:profitA,borderColor:'#35c98b',backgroundColor:'transparent',tension:.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:text}}},scales:{x:{ticks:{color:muted},grid:{color:grid}},y:{ticks:{color:muted},grid:{color:grid}}}}});
-st=new Chart(stockCanvas,{type:'line',data:{labels,datasets:[{label:'Closing Stock',data:stockA,borderColor:accent,backgroundColor:'transparent',tension:.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:text}}},scales:{x:{ticks:{color:muted},grid:{color:grid}},y:{ticks:{color:muted},grid:{color:grid}}}}});
-}else{
-  [salesCanvas,stockCanvas].forEach(cv=>{if(cv){const box=cv.parentElement;box.innerHTML='<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);text-align:center">📈 Chart is temporarily unavailable.<br>Refresh the page to load the graph.</div>';}});
-}
-requestAnimationFrame(()=>{if(sc)sc.resize();if(st)st.resize();});
+drawSVGChart('salesChart',labels,[{label:'Sales',data:salesA},{label:'Net Profit',data:profitA}]);
+drawSVGChart('stockChart',labels,[{label:'Closing Stock',data:stockA}]);
 refreshAI();renderHistory()}
 async function addEntry(){let g=id=>document.getElementById(id).value;let sales=+g('fSales')||0,exp=(+g('fRawCost')||0)+(+g('fPack')||0)+(+g('fLabour')||0)+(+g('fOther')||0);let e={date:g('fDate')||new Date().toISOString().slice(0,10),sales,orders:+g('fOrders')||0,units:+g('fUnits')||0,production:+g('fProduction')||0,raw:+g('fRaw')||0,rawCost:+g('fRawCost')||0,pack:+g('fPack')||0,labour:+g('fLabour')||0,other:+g('fOther')||0,expenses:exp,profit:sales-exp,stock:+g('fStock')||0,recv:+g('fRecv')||0,pay:+g('fPay')||0,damaged:+g('fDamaged')||0,product:g('fProduct')};let idx=data.findIndex(x=>x.date===e.date);if(idx>=0)data[idx]=e;else data.push(e);localStorage.setItem(KEY,JSON.stringify(data));render();await saveCloud(e);showTab('dash',document.querySelector('.tab'));alert(cloudReady?'Daily data saved to device + cloud.':'Daily data saved to this device. Connect cloud settings for automatic backup.')}
 function refreshAI(){let el=document.getElementById('insights');if(!el)return;if(!data.length){el.innerHTML='<div class="insight">Add daily data to analyze your business.</div>';return}let d=[...data].sort((a,b)=>a.date.localeCompare(b.date));let last=d[d.length-1],prev=d.slice(-8,-1),avgSales=prev.length?prev.reduce((s,x)=>s+x.sales,0)/prev.length:last.sales;let margin=last.sales?last.profit/last.sales*100:0;let avgUnits=prev.length?prev.reduce((s,x)=>s+x.units,0)/prev.length:last.units;let msgs=[];
@@ -512,6 +504,92 @@ async function addPartyPayment(){
  else{partyPayments.unshift({id:-Date.now(),user_id:'local',...payload,parties:{name:parties.find(p=>p.id===partyId)?.name||''},created_at:new Date().toISOString()});saveLocalPeople();}
  document.getElementById('payAmount').value='';document.getElementById('payNotes').value='';renderParties();
 }
+function drawSVGChart(id,labels,series){
+  const box=document.getElementById(id);if(!box)return;
+  const root=getComputedStyle(document.documentElement);
+  const text=root.getPropertyValue('--text').trim()||'#f5f7fa';
+  const muted=root.getPropertyValue('--muted').trim()||'#9da7b5';
+  const accent=root.getPropertyValue('--pink').trim()||'#d51b78';
+  const W=Math.max(520,box.clientWidth||520),H=Math.max(280,box.clientHeight||280),L=56,R=18,T=30,B=40,pw=W-L-R,ph=H-T-B;
+  const vals=series.flatMap(s=>s.data.map(v=>Number(v)||0));
+  let min=Math.min(0,...vals),max=Math.max(1,...vals);if(max===min)max=min+1;
+  const x=i=>labels.length<2?L+pw/2:L+(i/(labels.length-1))*pw;
+  const y=v=>T+ph-((Number(v)||0)-min)/(max-min)*ph;
+  const esc=s=>String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const grid=document.documentElement.classList.contains('white-theme')?'#e2e6eb':'#2d333d';
+  const colors=[accent,'#35c98b','#2d9cdb','#f59e0b'];
+  let svg='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">';
+  for(let g=0;g<=4;g++){
+    const yy=T+(ph*g/4),val=max-(max-min)*g/4;
+    svg+='<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="'+grid+'" stroke-width="1"/>';
+    svg+='<text x="'+(L-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="'+muted+'">'+esc(Math.round(val).toLocaleString('en-IN'))+'</text>';
+  }
+  series.forEach((s,si)=>{
+    const col=colors[si%colors.length];
+    const points=s.data.map((v,i)=>x(i)+','+y(v)).join(' ');
+    svg+='<polyline points="'+points+'" fill="none" stroke="'+col+'" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>';
+    s.data.forEach((v,i)=>svg+='<circle cx="'+x(i)+'" cy="'+y(v)+'" r="3.5" fill="'+col+'"/>');
+  });
+  const every=Math.max(1,Math.ceil(labels.length/6));
+  labels.forEach((lab,i)=>{if(i%every===0||i===labels.length-1)svg+='<text x="'+x(i)+'" y="'+(H-12)+'" text-anchor="middle" font-size="10" fill="'+muted+'">'+esc(lab)+'</text>';});
+  series.forEach((s,i)=>{const lx=L+i*160;svg+='<circle cx="'+lx+'" cy="14" r="4" fill="'+colors[i%colors.length]+'"/><text x="'+(lx+9)+'" y="18" font-size="10" fill="'+text+'">'+esc(s.label)+'</text>';});
+  svg+='</svg>';box.innerHTML=svg;
+}
+function closePartyLedger(){activeLedgerPartyId=null;const m=document.getElementById('khataModal');if(m)m.classList.add('hidden');const e=document.getElementById('khataEditor');if(e){e.classList.add('hidden');e.innerHTML='';}}
+function openPartyLedger(id){activeLedgerPartyId=Number(id);khataEditKind=null;khataEditId=null;const p=parties.find(x=>Number(x.id)===Number(id));if(!p)return;const m=document.getElementById('khataModal');if(m)m.classList.remove('hidden');const a=document.getElementById('khataAvatar'),t=document.getElementById('khataTitle'),s=document.getElementById('khataSub');if(a)a.textContent=(p.name||'?').trim().charAt(0).toUpperCase();if(t)t.textContent=p.name||'';if(s)s.textContent=(p.phone||'')+(p.phone&&p.party_type?' • ':'')+(p.party_type||'');renderKhataLedger();}
+function setKhataFilter(v){window.khataFilter=v;document.querySelectorAll('.kb-filter').forEach(x=>x.classList.remove('active'));const el=document.getElementById(v==='all'?'kbFilterAll':v==='gave'?'kbFilterGave':v==='got'?'kbFilterGot':'kbFilterSettled');if(el)el.classList.add('active');renderKhataLedger();}
+function openPartyFilters(){const e=document.getElementById('kbDateFilters');if(e)e.classList.toggle('hidden');}
+function renderKhataLedger(){
+  const id=Number(activeLedgerPartyId);const p=parties.find(x=>Number(x.id)===id);if(!p)return;
+  const bal=partyBalance(p);const set=(eid,v)=>{const e=document.getElementById(eid);if(e)e.textContent=v};
+  set('kbNetBalance',money(Math.abs(bal.net)));set('kbBalanceText',bal.net>0?'You will get':bal.net<0?'You will give':'Settled');set('kbGet',money(bal.oweMe));set('kbGive',money(bal.iOwe));
+  const from=document.getElementById('khataFrom')?.value||'',to=document.getElementById('khataTo')?.value||'',q=(document.getElementById('khataSearch')?.value||'').toLowerCase().trim(),f=window.khataFilter||'all';
+  let rows=[];
+  partyTransactions.filter(x=>Number(x.party_id)===id).forEach(x=>rows.push({kind:'tx',date:x.txn_date,title:x.txn_type==='sell'?'You Gave':'Purchase',amount:Number(x.amount||0),paid:Number(x.paid||0),due:Number(x.due||0),note:x.notes||'',obj:x}));
+  partyPayments.filter(x=>Number(x.party_id)===id).forEach(x=>rows.push({kind:'pay',date:x.payment_date,title:x.direction==='received'?'You Got':'Payment Paid',amount:Number(x.amount||0),paid:Number(x.amount||0),due:0,note:x.notes||'',obj:x}));
+  rows=rows.filter(x=>(!from||x.date>=from)&&(!to||x.date<=to)&&(!q||(x.title+' '+x.note).toLowerCase().includes(q)));
+  if(f==='gave')rows=rows.filter(x=>x.title==='You Gave'||x.title==='Payment Paid');
+  if(f==='got')rows=rows.filter(x=>x.title==='You Got'||x.title==='Purchase');
+  rows.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  const box=document.getElementById('khataLedgerRows');if(!box)return;
+  if(!rows.length){box.innerHTML='<div style="padding:34px 18px;text-align:center;color:#8b949e;font-size:12px">No transactions yet.<br><b style="display:block;color:#20252b;margin-top:5px">Tap You Gave or You Got to add an entry.</b></div>';return;}
+  box.innerHTML=rows.map(x=>'<div class="kb-txn"><div class="kb-txn-dot '+(x.title==='You Gave'||x.title==='Payment Paid'?'gave':'got')+'">'+(x.title==='You Gave'||x.title==='Payment Paid'?'↑':'↓')+'</div><div class="kb-txn-main"><div class="kb-txn-title">'+escapeHTML(x.title)+'</div><div class="kb-txn-note">'+escapeHTML(x.note||'')+'</div><div class="kb-txn-date">'+escapeHTML(x.date)+'</div></div><div class="kb-txn-amt"><b class="'+(x.title==='You Gave'||x.title==='Payment Paid'?'red':'green')+'">'+money(x.amount)+'</b><small>'+(x.due>0?'Due '+money(x.due):'Recorded')+'</small></div></div>').join('');
+}
+function startEditPartyAccount(){
+  const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p)return;const e=document.getElementById('khataEditor');if(!e)return;
+  e.classList.remove('hidden');e.innerHTML='<div class="section" style="margin:0 0 8px">Edit account</div><div class="formgrid"><div class="field"><label>Name</label><input id="editPartyName" value="'+escapeHTML(p.name||'')+'"></div><div class="field"><label>Mobile</label><input id="editPartyPhone" value="'+escapeHTML(p.phone||'')+'"></div><div class="field"><label>Type</label><select id="editPartyType"><option value="customer">Customer</option><option value="supplier">Supplier</option><option value="both">Customer + Supplier</option></select></div></div><div class="actions"><button onclick="saveEditedParty()">Save</button><button class="secondary" onclick="document.getElementById('khataEditor').classList.add('hidden')">Cancel</button></div>';
+  document.getElementById('editPartyType').value=p.party_type||'customer';
+}
+async function saveEditedParty(){const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p)return;const patch={name:document.getElementById('editPartyName').value.trim(),phone:document.getElementById('editPartyPhone').value.trim(),party_type:document.getElementById('editPartyType').value};if(!patch.name){alert('Enter a name.');return}if(cloudReady&&cloudUser){const q=await cloud.from('parties').update(patch).eq('id',p.id).eq('user_id',cloudUser.id).select().single();if(q.error){alert(q.error.message);return}Object.assign(p,q.data)}else{Object.assign(p,patch);saveLocalPeople()}document.getElementById('khataEditor').classList.add('hidden');renderParties();openPartyLedger(p.id);}
+async function quickPartyAction(kind){
+  const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p)return;const e=document.getElementById('khataEditor');if(!e)return;
+  const isTx=['sale','purchase'].includes(kind),dir=(kind==='received'?'received':'paid'),txType=kind==='purchase'?'buy':'sell';
+  e.classList.remove('hidden');e.innerHTML='<div class="section" style="margin:0 0 8px">'+(kind==='sale'?'You Gave':kind==='received'?'You Got':kind==='purchase'?'Purchase':'Payment Paid')+'</div><div class="formgrid"><div class="field"><label>Amount (₹)</label><input id="quickAmount" type="number" min="0" autofocus></div><div class="field"><label>Date</label><input id="quickDate" type="date" value="'+todayISO()+'"></div><div class="field"><label>Note</label><input id="quickNote" placeholder="Details"></div></div><div class="actions"><button onclick="saveQuickPartyAction(\''+kind+'\')">Save</button><button class="secondary" onclick="document.getElementById('khataEditor').classList.add('hidden')">Cancel</button></div>';
+}
+async function saveQuickPartyAction(kind){
+  const id=Number(activeLedgerPartyId),amount=Number(document.getElementById('quickAmount').value)||0;if(amount<=0){alert('Enter amount.');return}
+  const date=document.getElementById('quickDate').value||todayISO(),note=document.getElementById('quickNote').value.trim(),p=parties.find(x=>Number(x.id)===id);if(!p)return;
+  if(['sale','purchase'].includes(kind)){
+    const payload={party_id:id,txn_date:date,txn_type:kind==='purchase'?'buy':'sell',amount,paid:0,notes:note};
+    if(cloudReady&&cloudUser){const q=await cloud.from('party_transactions').insert({...payload,user_id:cloudUser.id}).select('*,parties(name)').single();if(q.error){alert(q.error.message);return}partyTransactions.unshift(q.data)}else{partyTransactions.unshift({id:-Date.now(),user_id:'local',...payload,due:amount,parties:{name:p.name},created_at:new Date().toISOString()});saveLocalPeople()}
+  }else{
+    const payload={party_id:id,payment_date:date,direction:kind==='received'?'received':'paid',amount,notes:note};
+    if(cloudReady&&cloudUser){const q=await cloud.from('party_payments').insert({...payload,user_id:cloudUser.id}).select('*,parties(name)').single();if(q.error){alert(q.error.message);return}partyPayments.unshift(q.data)}else{partyPayments.unshift({id:-Date.now(),user_id:'local',...payload,parties:{name:p.name},created_at:new Date().toISOString()});saveLocalPeople()}
+  }
+  document.getElementById('khataEditor').classList.add('hidden');renderParties();renderKhataLedger();
+}
+async function sharePartyStatement(){
+  const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p)return;const b=partyBalance(p);const msg='Khata statement - '+p.name+'\n'+(b.net>0?'You will get ':'You will give ')+money(Math.abs(b.net))+'\nUpdated: '+todayISO();
+  if(navigator.share){try{await navigator.share({title:'Khata - '+p.name,text:msg});return}catch(e){}}
+  try{await navigator.clipboard.writeText(msg);alert('Statement copied. You can paste it in WhatsApp.')}catch(e){prompt('Copy this statement:',msg)}
+}
+function partyStatementHTML(p){
+  const rows=[...partyTransactions.filter(x=>Number(x.party_id)===Number(p.id)).map(x=>({date:x.txn_date,title:x.txn_type==='sell'?'You Gave':'Purchase',amount:x.amount,due:x.due,note:x.notes})),...partyPayments.filter(x=>Number(x.party_id)===Number(p.id)).map(x=>({date:x.payment_date,title:x.direction==='received'?'You Got':'Payment Paid',amount:x.amount,due:0,note:x.notes}))].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  return '<html><head><title>Khata - '+escapeHTML(p.name)+'</title><style>body{font-family:Arial;padding:25px}h2{margin-bottom:4px}.sum{padding:14px;background:#f3f5f7;border-radius:10px;margin:12px 0}table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #ddd;text-align:left}</style></head><body><h2>Khata — '+escapeHTML(p.name)+'</h2><div>'+escapeHTML(p.phone||'')+'</div><div class="sum"><b>Get: '+money(partyBalance(p).oweMe)+'</b> &nbsp; <b>Give: '+money(partyBalance(p).iOwe)+'</b></div><table><tr><th>Date</th><th>Entry</th><th>Amount</th><th>Due</th><th>Note</th></tr>'+rows.map(x=>'<tr><td>'+escapeHTML(x.date)+'</td><td>'+escapeHTML(x.title)+'</td><td>'+money(x.amount)+'</td><td>'+money(x.due||0)+'</td><td>'+escapeHTML(x.note||'')+'</td></tr>').join('')+'</table></body></html>';
+}
+function printPartyStatement(){const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p)return;const w=window.open('','_blank');if(!w){alert('Please allow pop-ups for printing the Khata statement.');return}w.document.write(partyStatementHTML(p));w.document.close();w.focus();setTimeout(()=>w.print(),250);}
+function exportPartyStatement(){const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p)return;const rows=[['Date','Entry','Amount','Due','Note'],...partyTransactions.filter(x=>Number(x.party_id)===Number(p.id)).map(x=>[x.txn_date,x.txn_type==='sell'?'You Gave':'Purchase',x.amount,x.due,x.notes||'']),...partyPayments.filter(x=>Number(x.party_id)===Number(p.id)).map(x=>[x.payment_date,x.direction==='received'?'You Got':'Payment Paid',x.amount,0,x.notes||''])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='khata-'+p.name.replace(/[^a-z0-9-_]+/gi,'-').toLowerCase()+'.csv';a.click();}
+async function deletePartyAccount(){const p=parties.find(x=>Number(x.id)===Number(activeLedgerPartyId));if(!p||!confirm('Delete this Khata and its transactions?'))return;if(cloudReady&&cloudUser){await cloud.from('party_payments').delete().eq('party_id',p.id).eq('user_id',cloudUser.id);await cloud.from('party_transactions').delete().eq('party_id',p.id).eq('user_id',cloudUser.id);const q=await cloud.from('parties').delete().eq('id',p.id).eq('user_id',cloudUser.id);if(q.error){alert(q.error.message);return}}else{parties=parties.filter(x=>x.id!==p.id);partyTransactions=partyTransactions.filter(x=>x.party_id!==p.id);partyPayments=partyPayments.filter(x=>x.party_id!==p.id);saveLocalPeople()}closePartyLedger();renderParties();}
 function todayISO(){return new Date().toISOString().slice(0,10)}
 async function saveProduct(){
  const name=document.getElementById('prodName').value.trim();if(!name){alert('Enter product name.');return}
