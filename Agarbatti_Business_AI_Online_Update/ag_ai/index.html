@@ -97,7 +97,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 <div class="card"><div class="label">Orders</div><div class="value pink" id="orders">0</div></div>
 <div class="card"><div class="label">Closing Stock</div><div class="value blue" id="stock">0</div></div>
 </div>
-<div class="charts"><div class="chartbox"><div class="chart-title">Sales & Net Profit</div><canvas id="salesChart" class="biz-chart"></canvas></div><div class="chartbox"><div class="chart-title">Closing Stock</div><canvas id="stockChart" class="biz-chart"></canvas></div></div><div class="card ai" style="margin-top:14px">
+<div class="charts"><div class="chartbox"><div class="chart-title">Sales & Net Profit</div><div id="salesChart" class="biz-chart"></div></div><div class="chartbox"><div class="chart-title">Closing Stock</div><div id="stockChart" class="biz-chart"></div></div></div><div class="card ai" style="margin-top:14px">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
     <div><b>🤖 AI Business Assistant</b><div style="color:#9da7b5;font-size:12px;margin-top:4px">Ask your business questions and get instant insights from your dashboard.</div></div>
     <button onclick="toggleChat()">💬 Ask AI</button>
@@ -514,20 +514,21 @@ async function addPartyPayment(){
  document.getElementById('payAmount').value='';document.getElementById('payNotes').value='';renderParties();
 }
 function drawSVGChart(id,labels,series){
-  const canvas=document.getElementById(id);if(!canvas)return;
-  const dpr=window.devicePixelRatio||1,w=Math.max(300,canvas.clientWidth||600),h=275;
-  canvas.width=w*dpr;canvas.height=h*dpr;canvas.style.height=h+'px';
-  const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
-  const cs=getComputedStyle(document.documentElement),txt=cs.getPropertyValue('--text').trim()||'#20252b',muted=cs.getPropertyValue('--muted').trim()||'#66717c',accent=cs.getPropertyValue('--pink').trim()||'#d51b78';
-  const grid=document.documentElement.classList.contains('white-theme')?'#e3e7eb':'#2d333d',colors=[accent,'#35c98b','#2d9cdb','#f59e0b'];
-  const L=55,R=18,T=32,B=42,pw=w-L-R,ph=h-T-B,vals=series.flatMap(s=>s.data.map(v=>Number(v)||0));
-  let min=Math.min(0,...vals),max=Math.max(1,...vals);if(max===min)max=min+1;
+  const box=document.getElementById(id);if(!box)return;
+  const text=getComputedStyle(document.documentElement).getPropertyValue('--text').trim()||'#20252b';
+  const muted=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#66717c';
+  const accent=getComputedStyle(document.documentElement).getPropertyValue('--pink').trim()||'#d51b78';
+  const grid=document.documentElement.classList.contains('white-theme')?'#e3e7eb':'#2d333d';
+  const W=Math.max(420,box.clientWidth||600),H=275,L=55,R=18,T=30,B=40,pw=W-L-R,ph=H-T-B;
+  const vals=series.flatMap(s=>s.data.map(v=>Number(v)||0));let min=Math.min(0,...vals),max=Math.max(1,...vals);if(max===min)max=min+1;
   const x=i=>labels.length<2?L+pw/2:L+i/(labels.length-1)*pw,y=v=>T+ph-(Number(v)-min)/(max-min)*ph;
-  ctx.font='10px Arial';ctx.textAlign='right';ctx.lineWidth=1;
-  for(let g=0;g<=4;g++){const yy=T+ph*g/4,val=max-(max-min)*g/4;ctx.strokeStyle=grid;ctx.beginPath();ctx.moveTo(L,yy);ctx.lineTo(w-R,yy);ctx.stroke();ctx.fillStyle=muted;ctx.fillText(Math.round(val).toLocaleString('en-IN'),L-7,yy+4);}
-  series.forEach((s,si)=>{const col=colors[si%colors.length];ctx.strokeStyle=col;ctx.lineWidth=3;ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();s.data.forEach((v,i)=>{const xx=x(i),yy=y(Number(v)||0);i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)});ctx.stroke();s.data.forEach((v,i)=>{ctx.fillStyle=col;ctx.beginPath();ctx.arc(x(i),y(Number(v)||0),4,0,Math.PI*2);ctx.fill()});});
-  ctx.textAlign='center';ctx.fillStyle=muted;const every=Math.max(1,Math.ceil(labels.length/6));labels.forEach((lab,i)=>{if(i%every===0||i===labels.length-1)ctx.fillText(lab,x(i),h-13);});
-  ctx.textAlign='left';series.forEach((s,i)=>{ctx.fillStyle=colors[i%colors.length];ctx.beginPath();ctx.arc(L+i*145,14,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=txt;ctx.fillText(s.label,L+9+i*145,18);});
+  const esc=s=>String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const colors=[accent,'#35c98b','#2d9cdb','#f59e0b'];let out='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" style="width:100%;height:100%;display:block">';
+  for(let g=0;g<=4;g++){let yy=T+ph*g/4,val=max-(max-min)*g/4;out+='<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="'+grid+'"/><text x="'+(L-7)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="'+muted+'">'+esc(Math.round(val).toLocaleString('en-IN'))+'</text>'}
+  series.forEach((s,si)=>{let col=colors[si%4],pts=s.data.map((v,i)=>x(i)+','+y(v)).join(' ');out+='<polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>';s.data.forEach((v,i)=>out+='<circle cx="'+x(i)+'" cy="'+y(v)+'" r="4" fill="'+col+'"/>')});
+  const every=Math.max(1,Math.ceil(labels.length/6));labels.forEach((lab,i)=>{if(i%every===0||i===labels.length-1)out+='<text x="'+x(i)+'" y="'+(H-12)+'" text-anchor="middle" font-size="10" fill="'+muted+'">'+esc(lab)+'</text>'});
+  series.forEach((s,i)=>{let lx=L+i*145;out+='<circle cx="'+lx+'" cy="13" r="4" fill="'+colors[i%4]+'"/><text x="'+(lx+9)+'" y="17" font-size="10" fill="'+text+'">'+esc(s.label)+'</text>'});
+  out+='</svg>';box.innerHTML=out;
 }
 const KHATA_THEME_KEY='aggarbattiKhataTheme_v1';
 function applyKhataTheme(v){
@@ -698,7 +699,7 @@ function showTab(id,btn){
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='2.6.1';
+const APP_VERSION='2.6.2';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking…';
