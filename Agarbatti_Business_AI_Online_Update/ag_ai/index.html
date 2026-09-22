@@ -87,7 +87,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><textarea id="chatInput" rows="1" placeholder="Message Agarbatti AI…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 2.6.0</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('people',this)">📒 Khata Book</button><button class="tab" onclick="showTab('billing',this)">🧾 Billing</button><button class="tab" onclick="showTab('products',this)">📦 Products</button><button class="tab" onclick="showTab('expenses',this)">💰 Expenses</button><button class="tab" onclick="showTab('reports',this)">📊 Reports</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 2.6.3</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('people',this)">📒 Khata Book</button><button class="tab" onclick="showTab('billing',this)">🧾 Billing</button><button class="tab" onclick="showTab('products',this)">📦 Products</button><button class="tab" onclick="showTab('expenses',this)">💰 Expenses</button><button class="tab" onclick="showTab('reports',this)">📊 Reports</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -699,23 +699,36 @@ function showTab(id,btn){
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='2.6.2';
+const APP_VERSION='2.6.3';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
-  if(status) status.textContent='Checking…';
+  if(status) status.textContent='Checking online…';
   try{
-    if(!('serviceWorker' in navigator)){if(status)status.textContent='Updates require an online hosted site.';return;}
-    const reg=await navigator.serviceWorker.getRegistration();
-    if(!reg){if(status)status.textContent='Update system will activate after the site is hosted securely (HTTPS).';return;}
-    await reg.update();
-    if(reg.waiting){
-      if(status)status.textContent='New update found — applying…';
-      reg.waiting.postMessage({type:'SKIP_WAITING'});
-      reg.addEventListener('controllerchange',()=>window.location.reload(),{once:true});
+    const base=new URL('./',location.href).href;
+    const vr=await fetch(base+'version.json?t='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
+    if(!vr.ok)throw new Error('Version file unavailable ('+vr.status+').');
+    const remote=await vr.json();
+    const current=String(APP_VERSION);
+    const latest=String(remote.version||current);
+    const newer=versionCompare(latest,current)>0;
+    if(newer){
+      if(status)status.textContent='🆕 Update '+latest+' available';
+      if('serviceWorker' in navigator){
+        const reg=await navigator.serviceWorker.getRegistration();
+        if(reg){await reg.update();if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});reg.addEventListener('controllerchange',()=>window.location.reload(),{once:true});return;}}
+      }
+      if(status)status.innerHTML='🆕 Update '+latest+' available — reload to apply.';
     }else{
-      if(status)status.textContent='✓ You are using the latest version.';
+      if(status)status.textContent='✓ Latest version '+current;
     }
-  }catch(e){if(status)status.textContent='Update check failed. Try again.';}
+  }catch(e){
+    if(status)status.textContent='⚠ Online update check failed.';
+    console.warn('Update check failed:',e);
+  }
+}
+function versionCompare(a,b){
+  const A=String(a).replace(/^[^0-9]*/,'').split('.').map(Number),B=String(b).replace(/^[^0-9]*/,'').split('.').map(Number);
+  for(let i=0;i<Math.max(A.length,B.length);i++){const x=A[i]||0,y=B[i]||0;if(x!==y)return x-y}return 0
 }
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
