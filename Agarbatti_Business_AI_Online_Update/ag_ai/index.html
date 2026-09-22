@@ -78,7 +78,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><textarea id="chatInput" rows="1" placeholder="Message Agarbatti AI…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 2.5.4</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('billing',this)">🧾 Billing</button><button class="tab" onclick="showTab('products',this)">📦 Products</button><button class="tab" onclick="showTab('expenses',this)">💰 Expenses</button><button class="tab" onclick="showTab('reports',this)">📊 Reports</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 2.5.5</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('billing',this)">🧾 Billing</button><button class="tab" onclick="showTab('products',this)">📦 Products</button><button class="tab" onclick="showTab('expenses',this)">💰 Expenses</button><button class="tab" onclick="showTab('reports',this)">📊 Reports</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -413,10 +413,17 @@ const money=n=>'₹'+Math.round(n||0).toLocaleString('en-IN');
 function render(){data.sort((a,b)=>a.date.localeCompare(b.date));let sales=data.reduce((s,x)=>s+x.sales,0),profit=data.reduce((s,x)=>s+x.profit,0),units=data.reduce((s,x)=>s+x.units,0),orders=data.reduce((s,x)=>s+x.orders,0),stock=data.length?data[data.length-1].stock:0;
 document.getElementById('sales').textContent=money(sales);document.getElementById('profit').textContent=money(profit);document.getElementById('units').textContent=units.toLocaleString('en-IN');document.getElementById('orders').textContent=orders.toLocaleString('en-IN');document.getElementById('stock').textContent=stock.toLocaleString('en-IN');
 document.getElementById('rows').innerHTML=data.slice(-12).reverse().map(x=>`<tr><td>${x.date}</td><td>${money(x.sales)}</td><td>${x.orders}</td><td>${x.units}</td><td>${x.production}</td><td>${money(x.expenses)}</td><td>${money(x.profit)}</td><td>${x.stock}</td><td>${x.product}</td></tr>`).join('');
-let labels=data.map(x=>x.date.slice(5)), salesA=data.map(x=>x.sales), profitA=data.map(x=>x.profit), stockA=data.map(x=>x.stock);
-if(sc)sc.destroy();if(st)st.destroy();const accent=getComputedStyle(document.documentElement).getPropertyValue('--pink').trim();
-sc=new Chart(document.getElementById('salesChart'),{type:'line',data:{labels,datasets:[{label:'Sales',data:salesA,borderColor:accent,backgroundColor:accent},{label:'Net Profit',data:profitA,borderColor:'#35c98b',backgroundColor:'#35c98b'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#9da7b5'}},y:{ticks:{color:'#9da7b5'}}}}});
-st=new Chart(document.getElementById('stockChart'),{type:'line',data:{labels,datasets:[{label:'Closing Stock',data:stockA,borderColor:accent,backgroundColor:accent}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#9da7b5'}},y:{ticks:{color:'#9da7b5'}}}}});
+let labels=data.map(x=>x.date.slice(5)), salesA=data.map(x=>Number(x.sales||0)), profitA=data.map(x=>Number(x.profit||0)), stockA=data.map(x=>Number(x.stock||0));
+if(sc)sc.destroy();if(st)st.destroy();
+const root=getComputedStyle(document.documentElement),accent=root.getPropertyValue('--pink').trim()||'#d51b78',muted=root.getPropertyValue('--muted').trim()||'#9da7b5',text=root.getPropertyValue('--text').trim()||'#f5f7fa',grid=document.documentElement.classList.contains('white-theme')?'#dfe4ea':'#292f39';
+const salesCanvas=document.getElementById('salesChart'),stockCanvas=document.getElementById('stockChart');
+if(typeof Chart==='function'&&salesCanvas&&stockCanvas){
+sc=new Chart(salesCanvas,{type:'line',data:{labels,datasets:[{label:'Sales',data:salesA,borderColor:accent,backgroundColor:'transparent',tension:.3,pointRadius:3},{label:'Net Profit',data:profitA,borderColor:'#35c98b',backgroundColor:'transparent',tension:.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:text}}},scales:{x:{ticks:{color:muted},grid:{color:grid}},y:{ticks:{color:muted},grid:{color:grid}}}}});
+st=new Chart(stockCanvas,{type:'line',data:{labels,datasets:[{label:'Closing Stock',data:stockA,borderColor:accent,backgroundColor:'transparent',tension:.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:text}}},scales:{x:{ticks:{color:muted},grid:{color:grid}},y:{ticks:{color:muted},grid:{color:grid}}}}});
+}else{
+  [salesCanvas,stockCanvas].forEach(cv=>{if(cv){const box=cv.parentElement;box.innerHTML='<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);text-align:center">📈 Chart is temporarily unavailable.<br>Refresh the page to load the graph.</div>';}}});
+}
+requestAnimationFrame(()=>{if(sc)sc.resize();if(st)st.resize();});
 refreshAI();renderHistory()}
 async function addEntry(){let g=id=>document.getElementById(id).value;let sales=+g('fSales')||0,exp=(+g('fRawCost')||0)+(+g('fPack')||0)+(+g('fLabour')||0)+(+g('fOther')||0);let e={date:g('fDate')||new Date().toISOString().slice(0,10),sales,orders:+g('fOrders')||0,units:+g('fUnits')||0,production:+g('fProduction')||0,raw:+g('fRaw')||0,rawCost:+g('fRawCost')||0,pack:+g('fPack')||0,labour:+g('fLabour')||0,other:+g('fOther')||0,expenses:exp,profit:sales-exp,stock:+g('fStock')||0,recv:+g('fRecv')||0,pay:+g('fPay')||0,damaged:+g('fDamaged')||0,product:g('fProduct')};let idx=data.findIndex(x=>x.date===e.date);if(idx>=0)data[idx]=e;else data.push(e);localStorage.setItem(KEY,JSON.stringify(data));render();await saveCloud(e);showTab('dash',document.querySelector('.tab'));alert(cloudReady?'Daily data saved to device + cloud.':'Daily data saved to this device. Connect cloud settings for automatic backup.')}
 function refreshAI(){let el=document.getElementById('insights');if(!el)return;if(!data.length){el.innerHTML='<div class="insight">Add daily data to analyze your business.</div>';return}let d=[...data].sort((a,b)=>a.date.localeCompare(b.date));let last=d[d.length-1],prev=d.slice(-8,-1),avgSales=prev.length?prev.reduce((s,x)=>s+x.sales,0)/prev.length:last.sales;let margin=last.sales?last.profit/last.sales*100:0;let avgUnits=prev.length?prev.reduce((s,x)=>s+x.units,0)/prev.length:last.units;let msgs=[];
@@ -604,7 +611,7 @@ function showTab(id,btn){
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='2.5.2';
+const APP_VERSION='2.5.5';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking…';
