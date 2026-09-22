@@ -421,7 +421,7 @@ if(typeof Chart==='function'&&salesCanvas&&stockCanvas){
 sc=new Chart(salesCanvas,{type:'line',data:{labels,datasets:[{label:'Sales',data:salesA,borderColor:accent,backgroundColor:'transparent',tension:.3,pointRadius:3},{label:'Net Profit',data:profitA,borderColor:'#35c98b',backgroundColor:'transparent',tension:.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:text}}},scales:{x:{ticks:{color:muted},grid:{color:grid}},y:{ticks:{color:muted},grid:{color:grid}}}}});
 st=new Chart(stockCanvas,{type:'line',data:{labels,datasets:[{label:'Closing Stock',data:stockA,borderColor:accent,backgroundColor:'transparent',tension:.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:text}}},scales:{x:{ticks:{color:muted},grid:{color:grid}},y:{ticks:{color:muted},grid:{color:grid}}}}});
 }else{
-  [salesCanvas,stockCanvas].forEach(cv=>{if(cv){const box=cv.parentElement;box.innerHTML='<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);text-align:center">📈 Chart is temporarily unavailable.<br>Refresh the page to load the graph.</div>';}}});
+  [salesCanvas,stockCanvas].forEach(cv=>{if(cv){const box=cv.parentElement;box.innerHTML='<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);text-align:center">📈 Chart is temporarily unavailable.<br>Refresh the page to load the graph.</div>';}});
 }
 requestAnimationFrame(()=>{if(sc)sc.resize();if(st)st.resize();});
 refreshAI();renderHistory()}
