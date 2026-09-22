@@ -184,7 +184,24 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 .khata-home-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
 .khata-home-title{font-weight:800;margin:18px 2px 8px}.khata-home-person{width:100%;display:flex;align-items:center;gap:10px;padding:12px;margin:6px 0;border:0;border-radius:13px;background:var(--card,#171a21);color:inherit;text-align:left;cursor:pointer}.khp-main{flex:1;min-width:0}.khp-main b,.khp-main small,.khp-bal small{display:block}.khp-main small,.khp-bal small{font-size:10px;opacity:.6}.khp-bal{text-align:right;font-weight:800}.khp-bal.get{color:#36d399}.khp-bal.give{color:#ff6b7a}
 @media(max-width:650px){.khata-home{width:100%}.khata-home-head b{font-size:18px}.khata-home-summary b{font-size:18px}}
-</style><style>.update-now-btn{font-weight:800;border:1px solid currentColor;padding:8px 12px}</style></head>
+</style><style>.update-now-btn{font-weight:800;border:1px solid currentColor;padding:8px 12px}</style><style>
+.khbook{max-width:520px;margin:0 auto;min-height:calc(100vh - 130px);padding-bottom:82px;position:relative}
+.khbook-header{display:flex;align-items:center;justify-content:space-between;padding:13px 4px;position:sticky;top:0;z-index:15;background:var(--bg,#0e1015);border-bottom:1px solid rgba(128,128,128,.18)}
+.khbook-title{display:flex;align-items:center;gap:10px}.khbook-title b{display:block;font-size:20px}.khbook-title small{display:block;font-size:10px;opacity:.55}
+.khbook-logo{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#19a974;color:white;font-weight:900;font-size:20px}
+.khbook-head-actions{display:flex;gap:7px}.kh-head-btn{width:40px;height:40px;border-radius:50%;font-size:24px;padding:0}
+.khbook-search{padding:9px 0}.khbook-search input{width:100%;box-sizing:border-box;padding:13px 15px;border-radius:25px}
+.khbook-balance{margin:12px 0;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#138a62,#20ad7c);color:white;box-shadow:0 8px 22px rgba(0,0,0,.18)}
+.kh-total{text-align:center;padding:18px 10px 14px}.kh-total small{font-size:10px;letter-spacing:1px;opacity:.8;display:block}.kh-total strong{font-size:30px;display:block;margin:3px 0}.kh-total span{font-size:11px;opacity:.9}
+.kh-balance-row{display:grid;grid-template-columns:1fr 1fr;background:rgba(0,0,0,.12)}.kh-balance-row>div{padding:12px;text-align:center}.kh-balance-row>div+div{border-left:1px solid rgba(255,255,255,.2)}.kh-balance-row small{display:block;font-size:9px;opacity:.8}.kh-balance-row b{font-size:16px}
+.khbook-tabs{display:flex;background:var(--card,#171a21);border-radius:12px;padding:4px;margin:10px 0}.khbook-tab{flex:1;border:0;background:transparent;padding:11px 5px;border-radius:9px;color:inherit;font-weight:700}.khbook-tab.active{background:#19a974;color:white}
+.khbook-list-head{display:flex;justify-content:space-between;align-items:center;padding:13px 4px 6px;font-size:11px;opacity:.7}
+.khbook-list{display:flex;flex-direction:column;gap:7px}.khbook-person{display:flex;width:100%;align-items:center;gap:11px;padding:12px;border:0;border-radius:14px;background:var(--card,#171a21);color:inherit;text-align:left}.kh-avatar{width:45px;height:45px;flex:0 0 45px;border-radius:50%;display:grid;place-items:center;background:#e9f7f1;color:#168a60;font-size:18px;font-weight:800}.kh-person-main{min-width:0;flex:1}.kh-person-main b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kh-person-main small{display:block;font-size:10px;opacity:.55;margin-top:2px}.kh-person-main em{font-style:normal;font-size:9px;opacity:.45}.kh-person-money{text-align:right}.kh-person-money b{display:block}.kh-person-money small{font-size:9px}.kh-person-money.get{color:#20b77f}.kh-person-money.give{color:#ff6b79}
+.khbook-fab{position:fixed;right:max(18px,calc((100vw - 520px)/2 + 18px));bottom:78px;border:0;border-radius:25px;background:#19a974;color:white;font-weight:800;padding:13px 18px;box-shadow:0 8px 24px rgba(0,0,0,.28);z-index:20}.khbook-fab span{font-size:12px}
+.khbook-bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);height:64px;background:var(--card,#171a21);display:grid;grid-template-columns:repeat(4,1fr);z-index:19;border-top:1px solid rgba(128,128,128,.2)}.khbook-bottom button{border:0;background:transparent;color:inherit;opacity:.55;padding:7px}.khbook-bottom button.active{color:#19a974;opacity:1}.khbook-bottom small{display:block;font-size:10px;margin-top:3px}
+.kh-empty{text-align:center;padding:45px 20px;opacity:.7}.kh-empty-icon{margin:auto auto 10px;width:55px;height:55px;border-radius:50%;display:grid;place-items:center;background:#e9f7f1;color:#19a974;font-size:30px}.kh-empty p{font-size:12px}.kh-empty button{margin-top:8px}
+@media(max-width:650px){.khbook{max-width:none;padding-left:10px;padding-right:10px}.khbook-fab{right:16px}.khbook-header{top:58px}}
+</style></head>
 <body>
 <header><h1>🪔 AGARBATTI BUSINESS — AI DASHBOARD</h1><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="status" id="status">● Starting cloud sync…</span><label style="font-size:11px;color:#9da7b5">🎨 Color <select id="themeColor" class="theme-control" onchange="applyThemeColor(this.value)" aria-label="Dashboard color"><option value="#d51b78">Pink</option><option value="#2d9cdb">Blue</option><option value="#35c98b">Green</option><option value="#f59e0b">Orange</option><option value="#8b5cf6">Purple</option><option value="#ef4444">Red</option><option value="#ffffff">White</option></select></label></div></header>
 
@@ -360,23 +377,21 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 
 </section>
 <section id="khata" class="hidden">
-<div class="khata-home">
-  <div class="khata-home-head">
-    <button class="kb-icon" onclick="showTab('dash',document.querySelector('.tab[data-tab=\'dash\']'))">‹</button>
-    <div><b>Khata Book</b><small>Digital ledger</small></div>
-    <button class="kb-small" onclick="showTab('people',document.querySelector('.tab[data-tab=\'people\']'))">👥 People</button>
+<div class="khbook">
+  <div class="khbook-header">
+    <div class="khbook-title"><span class="khbook-logo">K</span><div><b>Khata</b><small>Digital Credit Ledger</small></div></div>
+    <div class="khbook-head-actions"><button class="kh-head-btn" onclick="openKhataHomeSearch()">⌕</button><button class="kh-head-btn" onclick="showAddPersonPanelFromKhata()">＋</button></div>
   </div>
-  <div class="khata-home-summary">
-    <div><span>YOU WILL GET</span><b id="khHomeGet">₹0</b></div>
-    <div><span>YOU WILL GIVE</span><b id="khHomeGive">₹0</b></div>
+  <div class="khbook-search hidden" id="khataHomeSearch"><input id="khHomeSearchInput" placeholder="Search by name or mobile" oninput="renderKhataBookHome()"></div>
+  <div class="khbook-balance">
+    <div class="kh-total"><small>NET BALANCE</small><strong id="khHomeNet">₹0</strong><span id="khHomeNetText">All accounts settled</span></div>
+    <div class="kh-balance-row"><div><small>YOU WILL GET</small><b id="khHomeGet">₹0</b></div><div><small>YOU WILL GIVE</small><b id="khHomeGive">₹0</b></div></div>
   </div>
-  <div class="khata-home-actions">
-    <button onclick="showAddPersonPanelFromKhata()">➕ Add Person</button>
-    <button class="secondary" onclick="openKhataHomeSearch()">🔎 Search</button>
-  </div>
-  <div id="khataHomeSearch" class="card hidden"><input id="khHomeSearchInput" placeholder="Search person or mobile" oninput="renderKhataBookHome()"></div>
-  <div class="khata-home-title">My Khata</div>
-  <div id="khataHomePeople" class="people-list"></div>
+  <div class="khbook-tabs"><button class="khbook-tab active" onclick="setKhHomeFilter('all',this)">All</button><button class="khbook-tab" onclick="setKhHomeFilter('customer',this)">Customers</button><button class="khbook-tab" onclick="setKhHomeFilter('supplier',this)">Suppliers</button></div>
+  <div class="khbook-list-head"><b>ACCOUNTS</b><span id="khHomeCount">0</span></div>
+  <div id="khataHomePeople" class="khbook-list"></div>
+  <button class="khbook-fab" onclick="showAddPersonPanelFromKhata()">＋ <span>Add Person</span></button>
+  <div class="khbook-bottom"><button class="active">▣<small>Khata</small></button><button onclick="showTab('people',document.querySelector('.tab[data-tab=\'people\']'))">♙<small>People</small></button><button onclick="showTab('billing',document.querySelector('.tab[data-tab=\'billing\']'))">▤<small>Bill</small></button><button onclick="showTab('reports',document.querySelector('.tab[data-tab=\'reports\']'))">◒<small>Reports</small></button></div>
 </div>
 </section>
 
@@ -875,46 +890,22 @@ if('serviceWorker' in navigator){
 }
 
 document.getElementById('fDate').value=new Date().toISOString().slice(0,10);document.getElementById('invDate').value=new Date().toISOString().slice(0,10);document.getElementById('exDate').value=new Date().toISOString().slice(0,10);document.getElementById('txDate').value=new Date().toISOString().slice(0,10);document.getElementById('payDate').value=new Date().toISOString().slice(0,10);initTheme();render();initCloudAuth();
-function openKhataBookHome(){
-  const s=document.getElementById('khataHomeSearchInput'); if(s)s.value='';
-  renderKhataBookHome();
-}
-function openKhataHomeSearch(){
-  const e=document.getElementById('khataHomeSearch'); if(e)e.classList.toggle('hidden');
-  const s=document.getElementById('khHomeSearchInput'); if(s){s.focus();renderKhataBookHome();}
-}
-function showAddPersonPanelFromKhata(){
-  showTab('people',document.querySelector('.tab[data-tab="people"]'));
-  setTimeout(()=>{showAddPersonPanel();document.getElementById('pName')?.focus();},50);
-}
+function openKhataBookHome(){renderKhataBookHome();}
+let khHomeFilter='all';
+function setKhHomeFilter(v,btn){khHomeFilter=v;document.querySelectorAll('.khbook-tab').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');renderKhataBookHome();}
+function openKhataHomeSearch(){const e=document.getElementById('khataHomeSearch');if(e)e.classList.toggle('hidden');const s=document.getElementById('khHomeSearchInput');if(s){s.focus();renderKhataBookHome();}}
+function showAddPersonPanelFromKhata(){showTab('people',document.querySelector('.tab[data-tab="people"]'));setTimeout(()=>{showAddPersonPanel();document.getElementById('pName')?.focus();},50);}
 function renderKhataBookHome(){
-  const box=document.getElementById('khataHomePeople'); if(!box)return;
-  const q=(document.getElementById('khHomeSearchInput')?.value||'').toLowerCase().trim();
-  const list=(window.parties||[]).filter(p=>!q||(p.name||'').toLowerCase().includes(q)||(p.phone||'').includes(q));
-  let get=0,give=0;
-  list.forEach(p=>{const b=partyBalance(p);get+=Number(b.oweMe||0);give+=Number(b.iOwe||0);});
-  const kg=document.getElementById('khHomeGet'),kp=document.getElementById('khHomeGive');if(kg)kg.textContent=money(get);if(kp)kp.textContent=money(give);
-  box.innerHTML=list.length?list.map(p=>{const b=partyBalance(p);const bal=Number(b.oweMe||0)-Number(b.iOwe||0);return '<button class="khata-home-person" onclick="openPartyLedger(\''+p.id+'\')"><span class="person-avatar">'+((p.name||'?')[0].toUpperCase())+'</span><span class="khp-main"><b>'+esc(p.name||'Unnamed')+'</b><small>'+esc(p.phone||'No mobile')+'</small></span><span class="khp-bal '+(bal>=0?'get':'give')+'">'+money(Math.abs(bal))+'<small>'+(bal>=0?'You will get':'You will give')+'</small></span></button>';}).join(''):'<div class="card" style="text-align:center;padding:30px">No people yet.<br><button style="margin-top:12px" onclick="showAddPersonPanelFromKhata()">➕ Add Person</button></div>';
+ const box=document.getElementById('khataHomePeople');if(!box)return;
+ const q=(document.getElementById('khHomeSearchInput')?.value||'').toLowerCase().trim();
+ const people=(window.parties||[]).filter(p=>(khHomeFilter==='all'||p.party_type===khHomeFilter||p.party_type==='both')&&(!q||(p.name||'').toLowerCase().includes(q)||(p.phone||'').includes(q)));
+ let get=0,give=0;people.forEach(p=>{const b=partyBalance(p);get+=Number(b.oweMe||0);give+=Number(b.iOwe||0);});
+ const net=get-give;
+ ['khHomeGet','khHomeGive'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.textContent=money(i?give:get);});
+ const n=document.getElementById('khHomeNet');if(n)n.textContent=money(Math.abs(net));
+ const nt=document.getElementById('khHomeNetText');if(nt)nt.textContent=net>0?'You will get':'You will give';
+ const ct=document.getElementById('khHomeCount');if(ct)ct.textContent=people.length;
+ box.innerHTML=people.length?people.map(p=>{const b=partyBalance(p),bal=Number(b.oweMe||0)-Number(b.iOwe||0),letter=((p.name||'?')[0]).toUpperCase();return '<button class="khbook-person" onclick="openPartyLedger(\''+p.id+'\')"><span class="kh-avatar">'+esc(letter)+'</span><span class="kh-person-main"><b>'+esc(p.name||'Unnamed')+'</b><small>'+esc(p.phone||'No mobile')+'</small><em>'+((p.party_type||'customer')==='supplier'?'Supplier':'Customer')+'</em></span><span class="kh-person-money '+(bal>=0?'get':'give')+'"><b>'+money(Math.abs(bal))+'</b><small>'+(bal>0?'You will get':bal<0?'You will give':'Settled')+'</small></span></button>';}).join(''):'<div class="kh-empty"><div class="kh-empty-icon">＋</div><b>No accounts yet</b><p>Add your first customer or supplier to start keeping khata.</p><button onclick="showAddPersonPanelFromKhata()">Add Person</button></div>';
 }
-
-async function updateNow(){
-  const status=document.getElementById('updateStatus');
-  if(status)status.textContent='Updating…';
-  try{
-    if('serviceWorker' in navigator){
-      const reg=await navigator.serviceWorker.getRegistration();
-      if(reg){
-        await reg.update();
-        if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});return;}
-      }
-    }
-    const u=new URL(location.href);
-    u.searchParams.set('update',Date.now());
-    location.replace(u.href);
-  }catch(e){
-    const u=new URL(location.href);u.searchParams.set('update',Date.now());location.replace(u.href);
-  }
-}
-window.addEventListener('load',()=>{setTimeout(()=>checkForUpdates(),1200);});
 </script>
 </body></html>
