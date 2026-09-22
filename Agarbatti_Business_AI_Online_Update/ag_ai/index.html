@@ -176,7 +176,15 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 
 
 </style>
-</head>
+<style>
+.khata-home{max-width:760px;margin:0 auto;padding-bottom:20px}
+.khata-home-head{display:flex;align-items:center;gap:10px;padding:12px 0;position:sticky;top:0;z-index:10;background:var(--bg,#0e1015)}
+.khata-home-head>div{flex:1}.khata-home-head b{display:block;font-size:20px}.khata-home-head small{opacity:.65}
+.khata-home-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.khata-home-summary>div{padding:16px;border-radius:14px;background:var(--card,#171a21)}.khata-home-summary span{display:block;font-size:10px;opacity:.7}.khata-home-summary b{font-size:22px;display:block;margin-top:5px}
+.khata-home-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+.khata-home-title{font-weight:800;margin:18px 2px 8px}.khata-home-person{width:100%;display:flex;align-items:center;gap:10px;padding:12px;margin:6px 0;border:0;border-radius:13px;background:var(--card,#171a21);color:inherit;text-align:left;cursor:pointer}.khp-main{flex:1;min-width:0}.khp-main b,.khp-main small,.khp-bal small{display:block}.khp-main small,.khp-bal small{font-size:10px;opacity:.6}.khp-bal{text-align:right;font-weight:800}.khp-bal.get{color:#36d399}.khp-bal.give{color:#ff6b7a}
+@media(max-width:650px){.khata-home{width:100%}.khata-home-head b{font-size:18px}.khata-home-summary b{font-size:18px}}
+</style></head>
 <body>
 <header><h1>🪔 AGARBATTI BUSINESS — AI DASHBOARD</h1><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="status" id="status">● Starting cloud sync…</span><label style="font-size:11px;color:#9da7b5">🎨 Color <select id="themeColor" class="theme-control" onchange="applyThemeColor(this.value)" aria-label="Dashboard color"><option value="#d51b78">Pink</option><option value="#2d9cdb">Blue</option><option value="#35c98b">Green</option><option value="#f59e0b">Orange</option><option value="#8b5cf6">Purple</option><option value="#ef4444">Red</option><option value="#ffffff">White</option></select></label></div></header>
 
@@ -189,7 +197,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><textarea id="chatInput" rows="1" placeholder="Message Agarbatti AI…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 2.6.3</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" data-tab="dash">Dashboard</button><button class="tab" data-tab="entry">Daily Entry</button><button class="tab" data-tab="history">📅 History</button><button class="tab" data-tab="people">👥 People</button><button class="tab" data-tab="people">📒 Khata Book</button><button class="tab" data-tab="billing">🧾 Billing</button><button class="tab" data-tab="products">📦 Products</button><button class="tab" data-tab="expenses">💰 Expenses</button><button class="tab" data-tab="reports">📊 Reports</button><button class="tab" data-tab="ai">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 2.6.3</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" data-tab="dash">Dashboard</button><button class="tab" data-tab="entry">Daily Entry</button><button class="tab" data-tab="history">📅 History</button><button class="tab" data-tab="people">👥 People</button><button class="tab" data-tab="khata">📒 Khata Book</button><button class="tab" data-tab="billing">🧾 Billing</button><button class="tab" data-tab="products">📦 Products</button><button class="tab" data-tab="expenses">💰 Expenses</button><button class="tab" data-tab="reports">📊 Reports</button><button class="tab" data-tab="ai">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -351,6 +359,27 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 </section>
 
 </section>
+<section id="khata" class="hidden">
+<div class="khata-home">
+  <div class="khata-home-head">
+    <button class="kb-icon" onclick="showTab('dash',document.querySelector('.tab[data-tab=\'dash\']'))">‹</button>
+    <div><b>Khata Book</b><small>Digital ledger</small></div>
+    <button class="kb-small" onclick="showTab('people',document.querySelector('.tab[data-tab=\'people\']'))">👥 People</button>
+  </div>
+  <div class="khata-home-summary">
+    <div><span>YOU WILL GET</span><b id="khHomeGet">₹0</b></div>
+    <div><span>YOU WILL GIVE</span><b id="khHomeGive">₹0</b></div>
+  </div>
+  <div class="khata-home-actions">
+    <button onclick="showAddPersonPanelFromKhata()">➕ Add Person</button>
+    <button class="secondary" onclick="openKhataHomeSearch()">🔎 Search</button>
+  </div>
+  <div id="khataHomeSearch" class="card hidden"><input id="khHomeSearchInput" placeholder="Search person or mobile" oninput="renderKhataBookHome()"></div>
+  <div class="khata-home-title">My Khata</div>
+  <div id="khataHomePeople" class="people-list"></div>
+</div>
+</section>
+
 <section id="billing" class="hidden">
 <div class="section">🧾 Billing / Invoice</div>
 <div class="card"><div class="formgrid">
@@ -791,9 +820,10 @@ function analyzeBusinessNow(){let el=document.getElementById('insights');if(!el)
 function exportCSV(){let h=['Date','Sales','Orders','Units','Production','Raw Material kg','Raw Purchase','Packaging','Labour','Other Expenses','Total Expenses','Net Profit','Stock','Receivable','Payable','Damaged','Top Product'];let rows=data.map(x=>[x.date,x.sales,x.orders,x.units,x.production,x.raw,x.rawCost,x.pack,x.labour,x.other,x.expenses,x.profit,x.stock,x.recv,x.pay,x.damaged,x.product]);let csv=[h,...rows].map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='aggarbatti-business-data.csv';a.click()}
 function resetData(){if(confirm('Reset to demo data?')){data=demo();localStorage.setItem(KEY,JSON.stringify(data));render()}}
 function showTab(id,btn){
-  ['dash','entry','history','people','ai','billing','products','expenses','reports'].forEach(x=>{const e=document.getElementById(x);if(e)e.classList.toggle('hidden',x!==id);});
+  ['dash','entry','history','people','khata','ai','billing','products','expenses','reports'].forEach(x=>{const e=document.getElementById(x);if(e)e.classList.toggle('hidden',x!==id);});
   if(id==='history')renderHistory();
   if(id==='people')loadParties();
+  if(id==='khata'){loadParties();openKhataBookHome();}
   if(id==='reports')renderBusinessReports();
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
   if(btn)btn.classList.add('active');
@@ -845,5 +875,26 @@ if('serviceWorker' in navigator){
 }
 
 document.getElementById('fDate').value=new Date().toISOString().slice(0,10);document.getElementById('invDate').value=new Date().toISOString().slice(0,10);document.getElementById('exDate').value=new Date().toISOString().slice(0,10);document.getElementById('txDate').value=new Date().toISOString().slice(0,10);document.getElementById('payDate').value=new Date().toISOString().slice(0,10);initTheme();render();initCloudAuth();
+function openKhataBookHome(){
+  const s=document.getElementById('khataHomeSearchInput'); if(s)s.value='';
+  renderKhataBookHome();
+}
+function openKhataHomeSearch(){
+  const e=document.getElementById('khataHomeSearch'); if(e)e.classList.toggle('hidden');
+  const s=document.getElementById('khHomeSearchInput'); if(s){s.focus();renderKhataBookHome();}
+}
+function showAddPersonPanelFromKhata(){
+  showTab('people',document.querySelector('.tab[data-tab="people"]'));
+  setTimeout(()=>{showAddPersonPanel();document.getElementById('pName')?.focus();},50);
+}
+function renderKhataBookHome(){
+  const box=document.getElementById('khataHomePeople'); if(!box)return;
+  const q=(document.getElementById('khHomeSearchInput')?.value||'').toLowerCase().trim();
+  const list=(window.parties||[]).filter(p=>!q||(p.name||'').toLowerCase().includes(q)||(p.phone||'').includes(q));
+  let get=0,give=0;
+  list.forEach(p=>{const b=partyBalance(p);get+=Number(b.oweMe||0);give+=Number(b.iOwe||0);});
+  const kg=document.getElementById('khHomeGet'),kp=document.getElementById('khHomeGive');if(kg)kg.textContent=money(get);if(kp)kp.textContent=money(give);
+  box.innerHTML=list.length?list.map(p=>{const b=partyBalance(p);const bal=Number(b.oweMe||0)-Number(b.iOwe||0);return '<button class="khata-home-person" onclick="openPartyLedger(\''+p.id+'\')"><span class="person-avatar">'+((p.name||'?')[0].toUpperCase())+'</span><span class="khp-main"><b>'+esc(p.name||'Unnamed')+'</b><small>'+esc(p.phone||'No mobile')+'</small></span><span class="khp-bal '+(bal>=0?'get':'give')+'">'+money(Math.abs(bal))+'<small>'+(bal>=0?'You will get':'You will give')+'</small></span></button>';}).join(''):'<div class="card" style="text-align:center;padding:30px">No people yet.<br><button style="margin-top:12px" onclick="showAddPersonPanelFromKhata()">➕ Add Person</button></div>';
+}
 </script>
 </body></html>
