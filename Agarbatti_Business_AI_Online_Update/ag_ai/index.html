@@ -108,9 +108,9 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   header label{font-size:10px!important}
   .theme-control{min-width:92px!important;padding:7px 8px!important;font-size:11px!important}
   .wrap{padding:10px 10px 0;max-width:none}
-  .tabs{position:fixed;left:0;right:0;bottom:0;margin:0;padding:7px 7px calc(7px + env(safe-area-inset-bottom));background:rgba(14,16,21,.97);border-top:1px solid #2d333d;z-index:60;display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;box-shadow:0 -8px 28px #0007}
+  .tabs{position:sticky;top:58px;z-index:30;margin:0 -10px 10px;padding:7px 10px;background:rgba(14,16,21,.98);border-top:1px solid #2d333d;border-bottom:1px solid #2d333d;display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;box-shadow:0 6px 16px #0004}
   .tabs::-webkit-scrollbar{display:none}
-  .tab{flex:0 0 auto;min-width:82px;min-height:48px;padding:8px 9px;border-radius:11px;font-size:11px;line-height:1.1;white-space:nowrap}
+  .tab{flex:0 0 auto;min-width:82px;min-height:48px;padding:8px 9px;border-radius:11px;font-size:11px;line-height:1.1;white-space:nowrap;pointer-events:auto;touch-action:manipulation}
   .grid{grid-template-columns:1fr 1fr;gap:8px}
   .card{padding:12px;border-radius:12px;min-width:0}
   .label{font-size:9px;letter-spacing:.2px}
@@ -189,7 +189,7 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
   <div class="chat-input"><textarea id="chatInput" rows="1" placeholder="Message Agarbatti AI…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea><button class="secondary" onclick="voiceCommand()">🎙️</button><button onclick="sendChat()">Send</button></div>
 </div>
 <div class="wrap">
-<div class="top-update"><span id="appVersion">Version 2.6.3</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" onclick="showTab('dash',this)">Dashboard</button><button class="tab" onclick="showTab('entry',this)">Daily Entry</button><button class="tab" onclick="showTab('history',this)">📅 History</button><button class="tab" onclick="showTab('people',this)">👥 People</button><button class="tab" onclick="showTab('people',this)">📒 Khata Book</button><button class="tab" onclick="showTab('billing',this)">🧾 Billing</button><button class="tab" onclick="showTab('products',this)">📦 Products</button><button class="tab" onclick="showTab('expenses',this)">💰 Expenses</button><button class="tab" onclick="showTab('reports',this)">📊 Reports</button><button class="tab" onclick="showTab('ai',this)">AI Assistant</button></div>
+<div class="top-update"><span id="appVersion">Version 2.6.3</span><button class="secondary" onclick="checkForUpdates()">🔄 Check for Updates</button><span id="updateStatus"></span></div><div class="tabs"><button class="tab active" data-tab="dash">Dashboard</button><button class="tab" data-tab="entry">Daily Entry</button><button class="tab" data-tab="history">📅 History</button><button class="tab" data-tab="people">👥 People</button><button class="tab" data-tab="people">📒 Khata Book</button><button class="tab" data-tab="billing">🧾 Billing</button><button class="tab" data-tab="products">📦 Products</button><button class="tab" data-tab="expenses">💰 Expenses</button><button class="tab" data-tab="reports">📊 Reports</button><button class="tab" data-tab="ai">AI Assistant</button></div>
 
 <section id="dash">
 <div class="grid">
@@ -798,10 +798,18 @@ function showTab(id,btn){
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
   if(btn)btn.classList.add('active');
 }
+window.showTab=showTab;
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.tab[data-tab]');
+  if(!btn)return;
+  e.preventDefault();
+  showTab(btn.dataset.tab,btn);
+  btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+},{passive:false});
 
 // Online update system: when this app is hosted online, the service worker checks the
 // server for a newer version. Users do not need to download a new ZIP.
-const APP_VERSION='2.6.3';
+const APP_VERSION='2.6.4';
 async function checkForUpdates(){
   const status=document.getElementById('updateStatus');
   if(status) status.textContent='Checking online…';
