@@ -407,8 +407,8 @@ input,select{background:#0f1217;color:#fff;border:1px solid #343b46;border-radiu
 <div class="field"><label>Rate (₹)</label><input id="invRate" type="number" min="0"></div>
 <div class="field"><label>Discount (₹)</label><input id="invDiscount" type="number" min="0" value="0"></div>
 <div class="field"><label>GST %</label><input id="invTax" type="number" min="0" value="0"></div>
-<div class="field"><label>Paid (₹)</label><input id="invPaid" type="number" min="0" value="0"></div><div class="field"><label>Print / Paper Size</label><select id="invPrintSize"><option value="thermal58">2-inch Portable Thermal (58mm)</option><option value="thermal80">3-inch Thermal (80mm)</option><option value="thermal100">4-inch Thermal (100mm)</option><option value="a5">A5</option><option value="a4" selected>A4</option></select></div>
-</div><div class="actions"><button onclick="saveInvoice()">💾 Save Invoice</button><button class="secondary" onclick="previewInvoice()">🖨️ Preview / Print</button><button class="secondary" onclick="sendCurrentBill()">📤 Send Bill</button></div><div id="invoiceResult" class="insight"></div></div>
+<div class="field"><label>Paid (₹)</label><input id="invPaid" type="number" min="0" value="0"></div><div class="field"><label>Print / Paper Size</label><select id="invPrintSize" onchange="updatePrinterHint()"><option value="thermal58">2-inch Portable Thermal (58mm)</option><option value="thermal80">3-inch Thermal (80mm)</option><option value="thermal100">4-inch Thermal (100mm)</option><option value="a5">A5</option><option value="a4" selected>A4</option></select></div>
+</div><div class="actions"><button onclick="saveInvoice()">💾 Save Invoice</button><button class="secondary" onclick="previewInvoice()">🖨️ Preview / Print</button><button class="secondary" onclick="connectBluetoothPrinter()">🔵 Connect Bluetooth Printer</button><button class="secondary" onclick="printBillBluetooth()">🖨️ Bluetooth Print</button><button class="secondary" onclick="sendCurrentBill()">📤 Send Bill</button></div><div id="printerStatus" class="insight">🔌 Printer: Not connected. For direct Bluetooth printing, use Android Chrome/another Web Bluetooth-compatible browser and a BLE ESC/POS printer.</div><div id="invoiceResult" class="insight"></div></div>
 <div class="section">Recent Invoices</div><div id="invoiceList" class="tablebox"></div>
 </section>
 <section id="products" class="hidden">
@@ -787,6 +787,63 @@ async function loadInvoices(){
 function currentBillData(){var party=document.getElementById('invParty'),type=document.getElementById('invType').value,partyName=party&&party.selectedOptions[0]?party.selectedOptions[0].textContent:(type==='purchase'?'Supplier':'Customer'),item=(document.getElementById('invItem').value||'Agarbatti').trim(),qty=+document.getElementById('invQty').value||0,rate=+document.getElementById('invRate').value||0,discount=+document.getElementById('invDiscount').value||0,taxRate=+document.getElementById('invTax').value||0,subtotal=qty*rate,tax=Math.max(0,(subtotal-discount)*taxRate/100),total=Math.max(0,subtotal-discount+tax),paid=Math.min(total,+document.getElementById('invPaid').value||0);return{type:type,partyLabel:type==='purchase'?'Supplier':'Customer',partyName:partyName,item:item,qty:qty,rate:rate,discount:discount,tax:tax,total:total,paid:paid,due:Math.max(0,total-paid),no:document.getElementById('invNo').value.trim()||'Draft Bill',date:document.getElementById('invDate').value||todayISO()};}
 function billText(b){return['AGARBATTI BUSINESS BILL',b.type==='purchase'?'PURCHASE BILL':'SALE BILL','Invoice: '+b.no,'Date: '+b.date,b.partyLabel+': '+b.partyName,'','Item: '+b.item,'Qty: '+b.qty+' x '+money(b.rate),'Subtotal: '+money(b.qty*b.rate),'Discount: '+money(b.discount),'GST: '+money(b.tax),'TOTAL: '+money(b.total),'Paid: '+money(b.paid),'Due: '+money(b.due),'','Thank you for your business.'].join('\\n');}
 function previewInvoice(){var b=currentBillData(),w=window.open('','_blank');if(!w){alert('Allow pop-ups to preview the bill.');return}var size=document.getElementById('invPrintSize')?.value||'a4',cfg={thermal58:{width:'58mm',font:'11px',pad:'5mm'},thermal80:{width:'80mm',font:'12px',pad:'5mm'},thermal100:{width:'100mm',font:'12px',pad:'6mm'},a5:{width:'148mm',font:'13px',pad:'10mm'},a4:{width:'210mm',font:'14px',pad:'15mm'}}[size];w.document.write('<!doctype html><html><head><title>'+escapeHTML(b.no)+'</title><style>@page{size:'+cfg.width+' auto;margin:0}*{box-sizing:border-box}body{font-family:Arial,sans-serif;width:'+cfg.width+';margin:0 auto;padding:'+cfg.pad+';font-size:'+cfg.font+';line-height:1.45}h2{text-align:center;margin:0 0 12px;font-size:1.35em}hr{border:0;border-top:1px dashed #777;margin:10px 0}.row{display:flex;justify-content:space-between;gap:8px}.total{font-size:1.3em;font-weight:700;border-top:1px dashed #777;padding-top:8px;margin-top:8px}.center{text-align:center}@media print{button{display:none}}</style></head><body><h2>AGARBATTI BUSINESS</h2><div class="center"><b>'+escapeHTML(b.type==='purchase'?'PURCHASE BILL':'SALE BILL')+'</b></div><div><b>Bill:</b> '+escapeHTML(b.no)+'<br><b>Date:</b> '+escapeHTML(b.date)+'<br><b>'+escapeHTML(b.partyLabel)+':</b> '+escapeHTML(b.partyName)+'</div><hr><div class="row"><span>'+escapeHTML(b.item)+'</span><span>'+b.qty+' × '+money(b.rate)+'</span></div><div class="row"><span>Subtotal</span><span>'+money(b.qty*b.rate)+'</span></div><div class="row"><span>Discount</span><span>'+money(b.discount)+'</span></div><div class="row"><span>GST</span><span>'+money(b.tax)+'</span></div><div class="row total"><span>TOTAL</span><span>'+money(b.total)+'</span></div><div class="row"><span>Paid</span><span>'+money(b.paid)+'</span></div><div class="row"><span>Due</span><span>'+money(b.due)+'</span></div><p class="center">Thank you for your business.</p></body></html>');w.document.close();setTimeout(function(){w.print()},400);}
+
+// Bluetooth thermal printer support (BLE ESC/POS).
+let btPrinter=null,btCharacteristic=null;
+function setPrinterStatus(msg,ok){const el=document.getElementById('printerStatus');if(el){el.textContent=(ok?'🟢 ':'🔌 ')+msg;el.className='insight '+(ok?'good':'');}}
+function updatePrinterHint(){const size=document.getElementById('invPrintSize')?.value||'a4';if(size==='thermal58')setPrinterStatus(btPrinter?'Printer connected. 58mm Bluetooth print is ready.':'Select 58mm for a 2-inch thermal receipt, then connect the printer.',!!btPrinter);else if(size.startsWith('thermal'))setPrinterStatus(btPrinter?'Printer connected.':'Bluetooth direct print is optimized for thermal receipt sizes.',!!btPrinter);}
+async function connectBluetoothPrinter(){
+ if(!navigator.bluetooth){setPrinterStatus('This browser does not support Web Bluetooth. On Android, try Chrome over HTTPS.',false);return;}
+ try{
+   setPrinterStatus('Searching for nearby Bluetooth LE printer…',false);
+   btPrinter=await navigator.bluetooth.requestDevice({acceptAllDevices:true,optionalServices:[
+     '000018f0-0000-1000-8000-00805f9b34fb',
+     '0000ae30-0000-1000-8000-00805f9b34fb',
+     '49535343-fe7d-4ae5-8fa9-9fafd205e455'
+   ]});
+   btPrinter.addEventListener('gattserverdisconnected',()=>{btCharacteristic=null;setPrinterStatus('Printer disconnected.',false);});
+   const server=await btPrinter.gatt.connect();
+   const services=await server.getPrimaryServices();
+   let found=null;
+   for(const service of services){
+     const chars=await service.getCharacteristics().catch(()=>[]);
+     for(const ch of chars){
+       if(ch.properties?.writeWithoutResponse||ch.properties?.write){found=ch;break;}
+     }
+     if(found)break;
+   }
+   if(!found)throw new Error('No writable BLE characteristic found. This printer may use Bluetooth Classic/SPP instead of BLE.');
+   btCharacteristic=found;
+   setPrinterStatus('Connected to '+(btPrinter.name||'Bluetooth thermal printer')+'.',true);
+ }catch(e){
+   btPrinter=null;btCharacteristic=null;
+   setPrinterStatus(e?.message||'Bluetooth connection cancelled.',false);
+ }
+}
+function escposLine(text,width){text=String(text??'');let out='';while(text.length>width){out+=text.slice(0,width)+'\\n';text=text.slice(width)}return out+text+'\\n';}
+function buildEscPosReceipt(b){
+ const size=document.getElementById('invPrintSize')?.value||'thermal58',width=size==='thermal80'?32:size==='thermal100'?42:32;
+ const lines=[];
+ lines.push('\\x1b\\x40','\\x1b\\x61\\x01','\\x1b\\x45\\x01','AGARBATTI BUSINESS','\\x1b\\x45\\x00',b.type==='purchase'?'PURCHASE BILL':'SALE BILL','\\x1b\\x61\\x00');
+ lines.push('Bill: '+b.no,'Date: '+b.date,escposLine(b.partyLabel+': '+b.partyName,width),'--------------------------------');
+ lines.push(escposLine(b.item,width),('Qty: '+b.qty+' x '+money(b.rate)),('Subtotal: '+money(b.qty*b.rate)),('Discount: '+money(b.discount)),('GST: '+money(b.tax)));
+ lines.push('================================', '\\x1b\\x45\\x01','TOTAL: '+money(b.total),'\\x1b\\x45\\x00','Paid: '+money(b.paid),'Due: '+money(b.due),'','Thank you!','\\n\\n\\n','\\x1d\\x56\\x00');
+ return lines.join('\\n');
+}
+async function writeBluetoothChunks(bytes){
+ if(!btCharacteristic)throw new Error('Connect a Bluetooth printer first.');
+ const max=180;
+ for(let i=0;i<bytes.length;i+=max){await btCharacteristic.writeValue(bytes.slice(i,i+max));await new Promise(r=>setTimeout(r,15));}
+}
+async function printBillBluetooth(){
+ const b=currentBillData();
+ if(!btCharacteristic){await connectBluetoothPrinter();if(!btCharacteristic)return;}
+ try{
+   const raw=buildEscPosReceipt(b),bytes=new TextEncoder().encode(raw);
+   await writeBluetoothChunks(bytes);
+   setPrinterStatus('Bill sent to '+(btPrinter?.name||'Bluetooth thermal printer')+'.',true);
+ }catch(e){setPrinterStatus('Bluetooth print failed: '+(e?.message||e),false);}
+}
 function sendCurrentBill(){var b=currentBillData(),txt=billText(b);if(navigator.share){navigator.share({title:'Bill '+b.no,text:txt}).catch(function(){})}else if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){alert('Bill copied. Paste it into WhatsApp, SMS or any chat app.')}).catch(function(){alert(txt)})}else{alert(txt)} }
 function renderBusinessReports(){
  const sales=data.reduce((s,x)=>s+(+x.sales||0),0),profit=data.reduce((s,x)=>s+(+x.profit||0),0),recv=data.reduce((s,x)=>s+(+x.recv||0),0),pay=data.reduce((s,x)=>s+(+x.pay||0),0);
